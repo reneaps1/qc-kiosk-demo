@@ -1,0 +1,2097 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Truck-Lite QC Kiosk</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tl-red:#CC2027;--tl-red-dark:#A01A1F;--tl-red-light:#E8434A;
+    --tl-black:#1A1A1A;--tl-dark:#2D2D2D;--tl-gray-900:#333333;
+    --tl-gray-700:#555555;--tl-gray-500:#888888;--tl-gray-300:#CCCCCC;
+    --tl-gray-100:#F0F0F0;--tl-white:#FFFFFF;
+    --tl-green:#2E9E5B;--tl-green-light:#E6F5EC;
+    --tl-amber:#E6940A;--tl-amber-light:#FFF5E0;
+    --tl-blue:#1A6FC4;--tl-blue-light:#E8F0FB;
+    --tl-purple:#7C3AED;--tl-purple-light:#EDE9FE;
+    --tl-teal:#0D7377;--tl-teal-light:#E0F4F4;
+    --tl-orange:#D4600A;--tl-orange-light:#FFF0E6;
+    --tl-fail:#CC2027;--tl-fail-light:#FDECEC;
+    --radius:12px;
+    --shadow-sm:0 1px 3px rgba(0,0,0,0.08);--shadow-md:0 4px 12px rgba(0,0,0,0.1);
+    --shadow-lg:0 8px 30px rgba(0,0,0,0.12);--shadow-xl:0 16px 50px rgba(0,0,0,0.15);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Barlow',sans-serif;background:var(--tl-gray-100);color:var(--tl-black);min-height:100vh;overflow-x:hidden;}
+
+  /* ── HEADER ── */
+  .header{background:var(--tl-black);padding:0 32px;height:72px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,0.3);}
+  .header-left{display:flex;align-items:center;gap:16px;}
+  .logo-mark{width:44px;height:44px;background:var(--tl-red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:14px;color:var(--tl-white);flex-shrink:0;}
+  .header-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;color:var(--tl-white);letter-spacing:1px;text-transform:uppercase;}
+  .header-subtitle{font-size:12px;color:var(--tl-gray-500);letter-spacing:2px;text-transform:uppercase;}
+  .header-right{display:flex;align-items:center;gap:12px;}
+  .header-badge{background:var(--tl-red);color:var(--tl-white);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+  .header-time{color:var(--tl-gray-500);font-size:14px;font-weight:500;font-variant-numeric:tabular-nums;}
+  .btn-home{background:var(--tl-dark);border:1px solid var(--tl-gray-700);color:var(--tl-gray-300);padding:8px 16px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;display:none;align-items:center;gap:6px;}
+  .btn-home:hover{background:var(--tl-gray-700);color:var(--tl-white);}
+  .btn-home.visible{display:flex;}
+  .db-tab-btn{background:var(--tl-dark);border:1px solid var(--tl-gray-700);color:var(--tl-gray-300);padding:8px 16px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+  .db-tab-btn:hover,.db-tab-btn.active{background:var(--tl-red);border-color:var(--tl-red);color:var(--tl-white);}
+  .module-crumb{color:var(--tl-gray-500);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;display:none;}
+  .module-crumb.visible{display:block;}
+
+  /* ── PROGRESS / STEPS (LPF only) ── */
+  .progress-bar{background:var(--tl-dark);height:4px;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--tl-red),var(--tl-red-light));transition:width 0.5s;border-radius:0 2px 2px 0;}
+  .steps-container{background:var(--tl-white);padding:16px 32px;display:flex;align-items:center;justify-content:center;gap:8px;border-bottom:1px solid var(--tl-gray-100);box-shadow:var(--shadow-sm);}
+  .step-item{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:8px;transition:all 0.3s;}
+  .step-item.active{background:var(--tl-fail-light);}
+  .step-item.completed{opacity:0.6;}
+  .step-item.pending{opacity:0.35;}
+  .step-number{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+  .step-item.active .step-number{background:var(--tl-red);color:var(--tl-white);}
+  .step-item.completed .step-number{background:var(--tl-green);color:var(--tl-white);}
+  .step-item.pending .step-number{background:var(--tl-gray-300);color:var(--tl-white);}
+  .step-label{font-size:13px;font-weight:600;color:var(--tl-gray-700);white-space:nowrap;}
+  .step-arrow{color:var(--tl-gray-300);font-size:18px;margin:0 4px;}
+  #lpfNav{display:none;}
+
+  /* ── MAIN ── */
+  .main{max-width:1100px;margin:0 auto;padding:32px 24px 100px;}
+  .screen-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:32px;color:var(--tl-black);text-transform:uppercase;margin-bottom:4px;}
+  .screen-desc{color:var(--tl-gray-700);font-size:16px;margin-bottom:28px;}
+
+  /* ── MODULE PANEL (home) ── */
+  .panel-hero{margin-bottom:36px;}
+  .panel-hero-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:36px;color:var(--tl-black);text-transform:uppercase;margin-bottom:6px;}
+  .panel-hero-sub{color:var(--tl-gray-700);font-size:16px;}
+  .modules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;}
+  .module-card{background:var(--tl-white);border:2px solid transparent;border-radius:16px;padding:32px 28px;cursor:pointer;transition:all 0.25s;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;}
+  .module-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:16px 16px 0 0;}
+  .module-card.color-red::before{background:var(--tl-red);}
+  .module-card.color-blue::before{background:var(--tl-blue);}
+  .module-card.color-purple::before{background:var(--tl-purple);}
+  .module-card.color-amber::before{background:var(--tl-amber);}
+  .module-card.color-teal::before{background:var(--tl-teal);}
+  .module-card:not(.disabled):hover{border-color:var(--tl-gray-300);box-shadow:var(--shadow-lg);transform:translateY(-3px);}
+  .module-card.disabled{cursor:not-allowed;opacity:0.55;}
+  .module-card-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:20px;}
+  .module-card.color-red .module-card-icon{background:var(--tl-fail-light);}
+  .module-card.color-blue .module-card-icon{background:var(--tl-blue-light);}
+  .module-card.color-purple .module-card-icon{background:var(--tl-purple-light);}
+  .module-card.color-amber .module-card-icon{background:var(--tl-amber-light);}
+  .module-card.color-teal .module-card-icon{background:var(--tl-teal-light);}
+  .module-card.color-green::before{background:var(--tl-green);}
+  .module-card.color-green .module-card-icon{background:var(--tl-green-light);}
+  .module-card.color-orange::before{background:var(--tl-orange);}
+  .module-card.color-orange .module-card-icon{background:var(--tl-orange-light);}
+  /* ── 8D MODULE ── */
+  .eightd-kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:28px;}
+  .eightd-list{display:flex;flex-direction:column;gap:16px;}
+  .eightd-card{background:var(--tl-white);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;border-left:5px solid var(--tl-gray-300);transition:box-shadow 0.2s;}
+  .eightd-card:hover{box-shadow:var(--shadow-md);}
+  .eightd-card.open{border-left-color:var(--tl-red);}
+  .eightd-card.progress{border-left-color:var(--tl-amber);}
+  .eightd-card.verify{border-left-color:var(--tl-blue);}
+  .eightd-card.closed{border-left-color:var(--tl-green);}
+  .eightd-header{padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;}
+  .eightd-header:hover{background:var(--tl-gray-100);}
+  .eightd-title-block{flex:1;}
+  .eightd-id{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:13px;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:1px;}
+  .eightd-title{font-weight:700;font-size:15px;margin:2px 0 4px;}
+  .eightd-meta{font-size:12px;color:var(--tl-gray-500);display:flex;gap:14px;flex-wrap:wrap;}
+  .eightd-badges{display:flex;gap:8px;align-items:center;flex-shrink:0;}
+  .eightd-st{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;}
+  .eightd-st.open{background:var(--tl-fail-light);color:var(--tl-fail);}
+  .eightd-st.progress{background:var(--tl-amber-light);color:var(--tl-amber);}
+  .eightd-st.verify{background:var(--tl-blue-light);color:var(--tl-blue);}
+  .eightd-st.closed{background:var(--tl-green-light);color:var(--tl-green);}
+  .eightd-chevron{font-size:18px;color:var(--tl-gray-500);transition:transform 0.3s;}
+  .eightd-chevron.open{transform:rotate(90deg);}
+  .eightd-body{display:none;border-top:1px solid var(--tl-gray-100);padding:20px 22px;}
+  .eightd-body.open{display:block;}
+  /* progress bar */
+  .eightd-progress-wrap{margin-bottom:20px;}
+  .eightd-progress-label{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--tl-gray-500);margin-bottom:6px;}
+  .eightd-progress-track{background:var(--tl-gray-100);border-radius:4px;height:10px;}
+  .eightd-progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--tl-green),var(--tl-green-light));transition:width 0.6s;}
+  /* steps grid */
+  .eightd-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+  .eightd-step{border-radius:10px;padding:12px 14px;border:2px solid var(--tl-gray-100);}
+  .eightd-step.done{background:var(--tl-green-light);border-color:var(--tl-green);}
+  .eightd-step.active-step{background:var(--tl-amber-light);border-color:var(--tl-amber);}
+  .eightd-step.pending{background:var(--tl-gray-100);border-color:var(--tl-gray-300);opacity:0.6;}
+  .eightd-step-label{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:15px;margin-bottom:2px;}
+  .eightd-step.done .eightd-step-label{color:var(--tl-green);}
+  .eightd-step.active-step .eightd-step-label{color:var(--tl-amber);}
+  .eightd-step.pending .eightd-step-label{color:var(--tl-gray-500);}
+  .eightd-step-title{font-size:11px;font-weight:700;text-transform:uppercase;margin-bottom:3px;}
+  .eightd-step-desc{font-size:11px;color:var(--tl-gray-700);line-height:1.4;}
+  /* detail fields */
+  .eightd-detail-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
+  .eightd-field{display:flex;flex-direction:column;gap:3px;}
+  .eightd-field-label{font-size:10px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:1px;}
+  .eightd-field-value{font-size:13px;font-weight:600;}
+  @media(max-width:768px){.eightd-steps{grid-template-columns:1fr 1fr}.eightd-kpi-row{grid-template-columns:repeat(3,1fr)}.eightd-detail-grid{grid-template-columns:1fr 1fr}}
+  /* alert severity / status */
+  .alert-sev{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+  .alert-sev.critica{background:var(--tl-fail-light);color:var(--tl-fail);}
+  .alert-sev.mayor{background:var(--tl-amber-light);color:var(--tl-amber);}
+  .alert-sev.menor{background:var(--tl-blue-light);color:var(--tl-blue);}
+  .alert-st{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+  .alert-st.abierta{background:var(--tl-fail-light);color:var(--tl-fail);}
+<br>  .alert-st.investigacion{background:var(--tl-amber-light);color:var(--tl-amber);}
+  .alert-st.cerrada{background:var(--tl-green-light);color:var(--tl-green);}
+  /* gestion cards */
+  .gr-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;}
+  .gr-card{background:var(--tl-white);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;}
+  .gr-card-header{padding:16px 22px;border-bottom:1px solid var(--tl-gray-100);display:flex;align-items:center;justify-content:space-between;}
+  .gr-card-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:1px;}
+  .gr-count-badge{background:var(--tl-fail-light);color:var(--tl-fail);border-radius:20px;font-size:11px;font-weight:700;padding:3px 10px;}
+  .gr-count-badge.amber{background:var(--tl-amber-light);color:var(--tl-amber);}
+  .gr-list{padding:0;}
+  .gr-item{padding:16px 22px;border-bottom:1px solid var(--tl-gray-100);transition:background 0.15s;}
+  .gr-item:last-child{border-bottom:none;}
+  .gr-item:hover{background:var(--tl-gray-100);}
+  .gr-item-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;}
+  .gr-item-title{font-weight:700;font-size:14px;flex:1;}
+  .gr-item-meta{font-size:12px;color:var(--tl-gray-500);display:flex;gap:12px;flex-wrap:wrap;}
+  .gr-item-meta span{display:flex;align-items:center;gap:4px;}
+  .gr-item-action{font-size:13px;color:var(--tl-gray-700);margin-top:6px;padding:8px 12px;background:var(--tl-gray-100);border-radius:6px;font-style:italic;}
+  .gr-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+  @media(max-width:768px){.gr-grid{grid-template-columns:1fr}.gr-kpi-row{grid-template-columns:1fr 1fr}}
+  /* ── FILTROS ── */
+  .gr-filters{background:var(--tl-white);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:16px 22px;margin-bottom:20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+  .gr-filter-label{font-size:11px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;}
+  .gr-filter-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .gr-chip{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:2px solid var(--tl-gray-200);background:var(--tl-white);color:var(--tl-gray-500);transition:all 0.2s;text-transform:uppercase;letter-spacing:0.5px;}
+  .gr-chip:hover{border-color:var(--tl-gray-500);color:var(--tl-black);}
+  .gr-chip.active{background:var(--tl-black);border-color:var(--tl-black);color:var(--tl-white);}
+  .gr-chip.chip-abierta.active{background:var(--tl-fail);border-color:var(--tl-fail);color:var(--tl-white);}
+  .gr-chip.chip-investigacion.active{background:var(--tl-amber);border-color:var(--tl-amber);color:var(--tl-white);}
+  .gr-chip.chip-cerrada.active{background:var(--tl-green);border-color:var(--tl-green);color:var(--tl-white);}
+  .gr-divider{width:1px;height:28px;background:var(--tl-gray-100);flex-shrink:0;}
+  .gr-results-info{margin-left:auto;font-size:12px;color:var(--tl-gray-500);font-weight:600;}
+  @media(max-width:768px){.gr-filters{gap:12px}.gr-results-info{margin-left:0}}
+  .gr-item.clickable{cursor:pointer;}
+  .gr-item.clickable:hover{background:var(--tl-teal-light);}
+  .gr-item-click-hint{font-size:11px;color:var(--tl-teal);font-weight:600;margin-top:4px;}
+  /* ── REPORTE MODAL ── */
+  .rpt-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:300;justify-content:center;align-items:flex-start;padding:24px 16px;overflow-y:auto;}
+  .rpt-overlay.active{display:flex;}
+  .rpt-panel{background:var(--tl-white);border-radius:16px;width:100%;max-width:960px;overflow:hidden;animation:fadeInUp 0.3s ease;box-shadow:var(--shadow-xl);}
+  .rpt-topbar{background:var(--tl-black);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;}
+  .rpt-topbar-left{display:flex;align-items:center;gap:16px;}
+  .rpt-id{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;color:var(--tl-white);text-transform:uppercase;letter-spacing:1px;}
+  .rpt-folio{font-size:12px;color:var(--tl-gray-500);}
+  .rpt-close{background:none;border:none;color:var(--tl-gray-500);font-size:28px;cursor:pointer;line-height:1;}
+  .rpt-close:hover{color:var(--tl-white);}
+  .rpt-body{padding:28px;}
+  /* Section */
+  .rpt-section{margin-bottom:24px;}
+  .rpt-section-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:2px;padding-bottom:8px;border-bottom:2px solid var(--tl-gray-100);margin-bottom:14px;}
+  /* Info grid */
+  .rpt-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .rpt-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+  .rpt-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  .rpt-field{display:flex;flex-direction:column;gap:3px;}
+  .rpt-label{font-size:10px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:1px;}
+  .rpt-value{font-size:14px;font-weight:600;color:var(--tl-black);}
+  /* Summary boxes */
+  .rpt-summary-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:4px;}
+  .rpt-sum-box{background:var(--tl-gray-100);border-radius:10px;padding:14px;text-align:center;}
+  .rpt-sum-box.ok{background:var(--tl-green-light);}
+  .rpt-sum-box.nok{background:var(--tl-fail-light);}
+  .rpt-sum-val{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:28px;line-height:1;}
+  .rpt-sum-box.ok .rpt-sum-val{color:var(--tl-green);}
+  .rpt-sum-box.nok .rpt-sum-val{color:var(--tl-fail);}
+  .rpt-sum-lbl{font-size:11px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;margin-top:4px;}
+  /* Sample table */
+  .rpt-table{width:100%;border-collapse:collapse;font-size:12px;}
+  .rpt-table thead th{background:var(--tl-black);color:var(--tl-white);text-align:center;padding:8px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;}
+  .rpt-table thead th:first-child{text-align:left;}
+  .rpt-table tbody td{padding:8px 10px;border-bottom:1px solid var(--tl-gray-100);text-align:center;font-variant-numeric:tabular-nums;}
+  .rpt-table tbody td:first-child{text-align:left;font-weight:700;}
+  .rpt-table tbody tr:hover{background:var(--tl-gray-100);}
+  .rpt-cell-ok{color:var(--tl-green);font-weight:700;}
+  .rpt-cell-nok{color:var(--tl-fail);font-weight:700;background:var(--tl-fail-light);}
+  .rpt-row-ok td:first-child{border-left:3px solid var(--tl-green);}
+  .rpt-row-nok td:first-child{border-left:3px solid var(--tl-fail);}
+  /* 8D steps */
+  .d8-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+  .d8-step{border-radius:10px;padding:12px;border:2px solid var(--tl-gray-100);}
+  .d8-step.done{border-color:var(--tl-green);background:var(--tl-green-light);}
+  .d8-step.pending{border-color:var(--tl-gray-300);background:var(--tl-gray-100);opacity:0.6;}
+  .d8-label{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;margin-bottom:2px;}
+  .d8-step.done .d8-label{color:var(--tl-green);}
+  .d8-step.pending .d8-label{color:var(--tl-gray-500);}
+  .d8-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+  .d8-desc{font-size:11px;color:var(--tl-gray-700);}
+  /* Footer */
+  .rpt-footer{background:var(--tl-gray-100);padding:16px 28px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .rpt-sign-row{display:flex;gap:32px;}
+  .rpt-sign{text-align:center;}
+  .rpt-sign-line{width:140px;height:1px;background:var(--tl-gray-300);margin:0 auto 4px;}
+  .rpt-sign-name{font-size:12px;font-weight:700;}
+  .rpt-sign-role{font-size:10px;color:var(--tl-gray-500);text-transform:uppercase;}
+  @media(max-width:768px){.rpt-grid-4{grid-template-columns:1fr 1fr}.rpt-summary-row{grid-template-columns:repeat(3,1fr)}.d8-grid{grid-template-columns:1fr 1fr}.rpt-grid-3{grid-template-columns:1fr 1fr}}
+  .module-card-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;text-transform:uppercase;margin-bottom:6px;}
+  .module-card-desc{color:var(--tl-gray-500);font-size:14px;line-height:1.5;}
+  .module-card-badge{display:inline-flex;align-items:center;gap:6px;margin-top:16px;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+  .badge-active{background:var(--tl-green-light);color:var(--tl-green);}
+  .badge-soon{background:var(--tl-gray-100);color:var(--tl-gray-500);}
+  .badge-dot{width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block;}
+
+  /* ── LPF MODULE (existing) ── */
+  .bu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;}
+  .bu-card{background:var(--tl-white);border:2px solid transparent;border-radius:var(--radius);padding:32px 28px;cursor:pointer;transition:all 0.25s;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;}
+  .bu-card::before{content:'';position:absolute;top:0;left:0;width:5px;height:100%;background:var(--tl-red);transform:scaleY(0);transition:transform 0.3s;transform-origin:top;}
+  .bu-card:hover{border-color:var(--tl-red);box-shadow:var(--shadow-lg);transform:translateY(-2px);}
+  .bu-card:hover::before{transform:scaleY(1);}
+  .bu-card.disabled{opacity:0.4;cursor:not-allowed;}
+  .bu-card.disabled:hover{border-color:transparent;box-shadow:var(--shadow-sm);transform:none;}
+  .bu-card.disabled::before{display:none;}
+  .bu-icon{width:48px;height:48px;background:var(--tl-fail-light);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px;}
+  .bu-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;margin-bottom:6px;}
+  .bu-desc{color:var(--tl-gray-500);font-size:14px;}
+  .bu-badge{display:inline-block;margin-top:12px;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+  .bu-badge.active{background:var(--tl-green-light);color:var(--tl-green);}
+  .bu-badge.soon{background:var(--tl-gray-100);color:var(--tl-gray-500);}
+  .product-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;}
+  .product-card{background:var(--tl-white);border:2px solid transparent;border-radius:var(--radius);padding:24px 20px;cursor:pointer;transition:all 0.25s;box-shadow:var(--shadow-sm);text-align:center;}
+  .product-card:hover{border-color:var(--tl-red);box-shadow:var(--shadow-lg);transform:translateY(-3px);}
+  .product-img{width:120px;height:90px;margin:0 auto 16px;background:var(--tl-gray-100);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--tl-gray-500);}
+  .product-img svg{width:60px;height:60px;}
+  .product-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;text-transform:uppercase;margin-bottom:4px;}
+  .product-pn{font-size:13px;color:var(--tl-gray-500);font-weight:500;}
+  .product-controls-count{margin-top:10px;font-size:12px;color:var(--tl-red);font-weight:600;}
+  .form-container{background:var(--tl-white);border-radius:var(--radius);box-shadow:var(--shadow-md);overflow:hidden;}
+  .form-header{background:var(--tl-black);padding:20px 28px;display:flex;align-items:center;}
+  .form-header-left{display:flex;align-items:center;gap:16px;}
+  .form-product-icon{width:44px;height:44px;background:var(--tl-red);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+  .form-product-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:var(--tl-white);text-transform:uppercase;}
+  .form-product-pn{font-size:13px;color:var(--tl-gray-500);}
+  .form-body{padding:28px;}
+  .form-section-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--tl-gray-100);}
+  .form-meta-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;margin-bottom:32px;}
+  .form-field{display:flex;flex-direction:column;gap:6px;}
+  .form-label{font-size:12px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:1px;}
+  .form-input,.form-select{padding:12px 14px;border:2px solid var(--tl-gray-100);border-radius:8px;font-family:'Barlow',sans-serif;font-size:15px;font-weight:500;color:var(--tl-black);background:var(--tl-white);outline:none;transition:border-color 0.2s;}
+  .form-input:focus,.form-select:focus{border-color:var(--tl-red);}
+  .form-textarea{padding:12px 14px;border:2px solid var(--tl-gray-100);border-radius:8px;font-family:'Barlow',sans-serif;font-size:15px;font-weight:500;color:var(--tl-black);background:var(--tl-white);outline:none;width:100%;min-height:80px;resize:vertical;transition:border-color 0.2s;}
+  .form-textarea:focus{border-color:var(--tl-red);}
+  .control-table{width:100%;border-collapse:collapse;}
+  .control-table thead th{text-align:left;font-size:11px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:1px;padding:10px 14px;border-bottom:2px solid var(--tl-gray-100);}
+  .control-table tbody tr{transition:background 0.15s;}
+  .control-table tbody tr:hover{background:var(--tl-gray-100);}
+  .control-table td{padding:12px 14px;border-bottom:1px solid var(--tl-gray-100);vertical-align:middle;font-size:14px;}
+  .control-name{font-weight:600;}
+  .control-spec{font-size:13px;color:var(--tl-gray-500);font-variant-numeric:tabular-nums;}
+  .control-input{width:120px;padding:10px 12px;border:2px solid var(--tl-gray-300);border-radius:8px;font-family:'Barlow',sans-serif;font-size:16px;font-weight:600;text-align:center;outline:none;transition:all 0.2s;font-variant-numeric:tabular-nums;}
+  .control-input:focus{border-color:var(--tl-red);box-shadow:0 0 0 3px rgba(204,32,39,0.1);}
+  .control-input.pass{border-color:var(--tl-green);background:var(--tl-green-light);}
+  .control-input.fail{border-color:var(--tl-fail);background:var(--tl-fail-light);}
+  .control-status{display:inline-flex;align-items:center;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;text-transform:uppercase;min-width:70px;justify-content:center;}
+  .control-status.pass{background:var(--tl-green-light);color:var(--tl-green);}
+  .control-status.fail{background:var(--tl-fail-light);color:var(--tl-fail);}
+  .control-status.pending{background:var(--tl-gray-100);color:var(--tl-gray-500);}
+  .control-status.conditional{background:var(--tl-amber-light);color:var(--tl-amber);}
+  .var-buttons{display:flex;gap:8px;}
+  .var-btn{padding:10px 20px;border:2px solid var(--tl-gray-300);border-radius:8px;font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;background:var(--tl-white);text-transform:uppercase;}
+  .var-btn.pass-btn:hover,.var-btn.pass-btn.selected{background:var(--tl-green);border-color:var(--tl-green);color:var(--tl-white);}
+  .var-btn.fail-btn:hover,.var-btn.fail-btn.selected{background:var(--tl-fail);border-color:var(--tl-fail);color:var(--tl-white);}
+  .form-actions{padding:24px 28px;border-top:2px solid var(--tl-gray-100);display:flex;justify-content:space-between;align-items:center;}
+  .btn-submit{background:var(--tl-red);color:var(--tl-white);border:none;padding:16px 48px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:1.5px;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 15px rgba(204,32,39,0.3);}
+  .btn-submit:hover{background:var(--tl-red-dark);transform:translateY(-1px);}
+  .btn-back{background:none;border:2px solid var(--tl-gray-300);padding:14px 28px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;color:var(--tl-gray-700);}
+  .btn-back:hover{border-color:var(--tl-black);color:var(--tl-black);}
+  .nc-panel{background:var(--tl-white);border:2px solid var(--tl-fail);border-radius:var(--radius);margin-top:24px;overflow:hidden;animation:fadeInUp 0.4s ease;}
+  .nc-header{background:linear-gradient(135deg,var(--tl-fail),var(--tl-red-dark));padding:20px 28px;display:flex;align-items:center;gap:14px;}
+  .nc-header-icon{font-size:28px;}
+  .nc-header-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:var(--tl-white);text-transform:uppercase;}
+  .nc-header-sub{font-size:13px;color:rgba(255,255,255,0.7);}
+  .nc-body{padding:24px 28px;}
+  .nc-steps{display:flex;flex-direction:column;margin-bottom:24px;}
+  .nc-step{display:flex;gap:16px;padding:14px 0;}
+  .nc-step:not(:last-child){border-bottom:1px dashed var(--tl-gray-300);}
+  .nc-step-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;}
+  .nc-step-num.done{background:var(--tl-green);color:var(--tl-white);}
+  .nc-step-num.current{background:var(--tl-amber);color:var(--tl-white);animation:pulse 2s infinite;}
+  .nc-step-num.pending-step{background:var(--tl-gray-300);color:var(--tl-white);}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(230,148,10,0.4)}50%{box-shadow:0 0 0 8px rgba(230,148,10,0)}}
+  .nc-step-title{font-weight:700;font-size:15px;margin-bottom:2px;}
+  .nc-step-desc{font-size:13px;color:var(--tl-gray-500);}
+  .nc-failed-list{background:var(--tl-fail-light);border-radius:8px;padding:14px 18px;margin-bottom:20px;}
+  .nc-failed-title{font-size:12px;font-weight:700;color:var(--tl-fail);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+  .nc-failed-item{font-size:14px;padding:4px 0;font-weight:500;}
+  .nc-confirm-box{background:var(--tl-amber-light);border:2px solid var(--tl-amber);border-radius:10px;padding:20px;margin-top:20px;}
+  .nc-confirm-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:var(--tl-amber);text-transform:uppercase;margin-bottom:12px;}
+  .nc-checkbox-row{display:flex;align-items:center;gap:12px;padding:10px 0;cursor:pointer;}
+  .nc-checkbox{width:24px;height:24px;border:2px solid var(--tl-amber);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent;transition:all 0.2s;cursor:pointer;flex-shrink:0;}
+  .nc-checkbox.checked{background:var(--tl-amber);color:var(--tl-white);}
+  .nc-checkbox-label{font-size:14px;font-weight:500;}
+  .ticket{background:var(--tl-white);border:2px dashed var(--tl-gray-300);border-radius:16px;max-width:500px;margin:0 auto;overflow:hidden;}
+  .ticket-strip{height:8px;}
+  .ticket-strip.pass{background:var(--tl-green);}
+  .ticket-strip.conditional{background:var(--tl-amber);}
+  .ticket-body{padding:28px;text-align:center;}
+  .ticket-logo{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;color:var(--tl-gray-500);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;}
+  .ticket-status{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:28px;text-transform:uppercase;margin-bottom:4px;}
+  .ticket-status.pass{color:var(--tl-green);}
+  .ticket-status.conditional{color:var(--tl-amber);}
+  .ticket-folio{font-size:13px;color:var(--tl-gray-500);margin-bottom:20px;}
+  .ticket-qr{width:140px;height:140px;margin:0 auto 20px;}
+  .ticket-details{text-align:left;border-top:1px solid var(--tl-gray-100);padding-top:16px;}
+  .ticket-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;}
+  .ticket-row-label{color:var(--tl-gray-500);}
+  .ticket-row-value{font-weight:700;}
+  .ticket-condition{background:var(--tl-amber-light);border-radius:8px;padding:12px 16px;margin-top:16px;text-align:left;}
+  .ticket-condition-title{font-size:11px;font-weight:700;color:var(--tl-amber);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+  .ticket-condition-text{font-size:13px;font-weight:500;}
+  .ticket-footer{border-top:1px dashed var(--tl-gray-300);padding:14px 28px;text-align:center;font-size:11px;color:var(--tl-gray-500);}
+  .confirm-container{max-width:600px;margin:0 auto;text-align:center;}
+  .confirm-icon{width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:48px;}
+  .confirm-icon.pass{background:var(--tl-green-light);color:var(--tl-green);}
+  .confirm-icon.conditional{background:var(--tl-amber-light);color:var(--tl-amber);}
+  .confirm-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:36px;text-transform:uppercase;margin-bottom:8px;}
+  .confirm-title.pass{color:var(--tl-green);}
+  .confirm-title.conditional{color:var(--tl-amber);}
+  .confirm-subtitle{color:var(--tl-gray-500);font-size:16px;margin-bottom:32px;}
+  .btn-new{background:var(--tl-black);color:var(--tl-white);border:none;padding:16px 48px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:1.5px;cursor:pointer;transition:all 0.2s;}
+  .btn-new:hover{background:var(--tl-gray-900);transform:translateY(-1px);}
+
+  /* ── DASHBOARD ── */
+  .dash-kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:32px;}
+  .kpi-card{background:var(--tl-white);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-sm);border-left:4px solid transparent;position:relative;overflow:hidden;}
+  .kpi-card.kpi-green{border-left-color:var(--tl-green);}
+  .kpi-card.kpi-red{border-left-color:var(--tl-red);}
+  .kpi-card.kpi-amber{border-left-color:var(--tl-amber);}
+  .kpi-card.kpi-blue{border-left-color:var(--tl-blue);}
+  .kpi-label{font-size:11px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+  .kpi-value{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:38px;line-height:1;margin-bottom:4px;}
+  .kpi-card.kpi-green .kpi-value{color:var(--tl-green);}
+  .kpi-card.kpi-red .kpi-value{color:var(--tl-red);}
+  .kpi-card.kpi-amber .kpi-value{color:var(--tl-amber);}
+  .kpi-card.kpi-blue .kpi-value{color:var(--tl-blue);}
+  .kpi-sub{font-size:12px;color:var(--tl-gray-500);}
+  .dash-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;}
+  .dash-row.single{grid-template-columns:1fr;}
+  .dash-card{background:var(--tl-white);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;}
+  .dash-card-header{padding:18px 24px;border-bottom:1px solid var(--tl-gray-100);display:flex;align-items:center;justify-content:space-between;}
+  .dash-card-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:1px;}
+  .dash-card-sub{font-size:12px;color:var(--tl-gray-500);}
+  .dash-card-body{padding:20px 24px;}
+  /* Bar chart */
+  .bar-chart{display:flex;flex-direction:column;gap:14px;}
+  .bar-row{display:flex;align-items:center;gap:12px;}
+  .bar-label{font-size:13px;font-weight:600;width:110px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bar-track{flex:1;background:var(--tl-gray-100);border-radius:4px;height:22px;position:relative;}
+  .bar-fill{height:100%;border-radius:4px;transition:width 0.6s ease;display:flex;align-items:center;padding-left:8px;}
+  .bar-fill.green{background:var(--tl-green);}
+  .bar-fill.red{background:var(--tl-red);}
+  .bar-fill.amber{background:var(--tl-amber);}
+  .bar-fill.blue{background:var(--tl-blue);}
+  .bar-val{font-size:11px;font-weight:700;color:var(--tl-white);}
+  .bar-pct{font-size:12px;color:var(--tl-gray-500);width:36px;text-align:right;flex-shrink:0;}
+  /* Donut */
+  .donut-wrap{display:flex;align-items:center;gap:24px;}
+  .donut-svg{flex-shrink:0;}
+  .donut-legend{display:flex;flex-direction:column;gap:10px;}
+  .legend-item{display:flex;align-items:center;gap:10px;}
+  .legend-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+  .legend-label{font-size:13px;font-weight:600;}
+  .legend-val{font-size:13px;color:var(--tl-gray-500);}
+  /* Recent table */
+  .dash-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .dash-table thead th{text-align:left;font-size:11px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;padding:8px 12px;border-bottom:2px solid var(--tl-gray-100);}
+  .dash-table tbody td{padding:10px 12px;border-bottom:1px solid var(--tl-gray-100);}
+  .dash-table tbody tr:last-child td{border-bottom:none;}
+  .dash-table tbody tr:hover{background:var(--tl-gray-100);}
+  .dash-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;}
+  .dash-badge.pass{background:var(--tl-green-light);color:var(--tl-green);}
+  .dash-badge.conditional{background:var(--tl-amber-light);color:var(--tl-amber);}
+  .dash-note{font-size:12px;color:var(--tl-gray-500);margin-top:12px;text-align:center;}
+
+  /* ── 5S MODULE ── */
+  .fs-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+  .fs-filters{background:var(--tl-white);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+  .fs-filter-label{font-size:11px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:1px;}
+  .fs-chip{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:2px solid var(--tl-gray-200);background:var(--tl-white);color:var(--tl-gray-500);transition:all 0.2s;text-transform:uppercase;}
+  .fs-chip:hover{border-color:var(--tl-gray-500);color:var(--tl-black);}
+  .fs-chip.active{background:var(--tl-black);border-color:var(--tl-black);color:var(--tl-white);}
+  .fs-chip.chip-aprobada.active{background:var(--tl-green);border-color:var(--tl-green);}
+  .fs-chip.chip-observaciones.active{background:var(--tl-amber);border-color:var(--tl-amber);}
+  .fs-chip.chip-reprobada.active{background:var(--tl-fail);border-color:var(--tl-fail);}
+  .fs-table-wrap{background:var(--tl-white);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;}
+  .fs-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .fs-table thead th{background:var(--tl-black);color:var(--tl-white);text-align:center;padding:10px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;}
+  .fs-table thead th:first-child,.fs-table thead th:nth-child(2){text-align:left;}
+  .fs-table tbody td{padding:12px 14px;border-bottom:1px solid var(--tl-gray-100);text-align:center;vertical-align:middle;}
+  .fs-table tbody td:first-child,.fs-table tbody td:nth-child(2){text-align:left;}
+  .fs-table tbody tr:hover{background:var(--tl-gray-100);cursor:pointer;}
+  .fs-score{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:15px;}
+  .fs-score.high{color:var(--tl-green);}
+  .fs-score.mid{color:var(--tl-amber);}
+  .fs-score.low{color:var(--tl-fail);}
+  .fs-st{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;}
+  .fs-st.aprobada{background:var(--tl-green-light);color:var(--tl-green);}
+  .fs-st.observaciones{background:var(--tl-amber-light);color:var(--tl-amber);}
+  .fs-st.reprobada{background:var(--tl-fail-light);color:var(--tl-fail);}
+  /* 5S detail card */
+  .fs-detail{background:var(--tl-white);border-radius:var(--radius);box-shadow:var(--shadow-md);overflow:hidden;margin-top:20px;}
+  .fs-detail-header{background:var(--tl-black);padding:18px 28px;display:flex;align-items:center;justify-content:space-between;}
+  .fs-detail-id{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;color:var(--tl-white);}
+  .fs-detail-meta{font-size:12px;color:var(--tl-gray-500);}
+  .fs-detail-close{background:none;border:none;color:var(--tl-gray-500);font-size:28px;cursor:pointer;line-height:1;}
+  .fs-detail-close:hover{color:var(--tl-white);}
+  .fs-detail-body{padding:28px;}
+  .fs-s-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px;}
+  .fs-s-card{border-radius:10px;padding:16px;text-align:center;border:2px solid var(--tl-gray-100);}
+  .fs-s-card.high{border-color:var(--tl-green);background:var(--tl-green-light);}
+  .fs-s-card.mid{border-color:var(--tl-amber);background:var(--tl-amber-light);}
+  .fs-s-card.low{border-color:var(--tl-fail);background:var(--tl-fail-light);}
+  .fs-s-name{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;margin-bottom:2px;}
+  .fs-s-card.high .fs-s-name{color:var(--tl-green);}
+  .fs-s-card.mid .fs-s-name{color:var(--tl-amber);}
+  .fs-s-card.low .fs-s-name{color:var(--tl-fail);}
+  .fs-s-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;color:var(--tl-gray-700);}
+  .fs-s-score{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:30px;line-height:1;}
+  .fs-s-card.high .fs-s-score{color:var(--tl-green);}
+  .fs-s-card.mid .fs-s-score{color:var(--tl-amber);}
+  .fs-s-card.low .fs-s-score{color:var(--tl-fail);}
+  .fs-s-max{font-size:11px;color:var(--tl-gray-500);}
+  .fs-obs-box{background:var(--tl-gray-100);border-radius:8px;padding:14px 18px;margin-bottom:20px;}
+  .fs-obs-label{font-size:11px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+  .fs-obs-text{font-size:14px;line-height:1.5;}
+  .fs-action-list{display:flex;flex-direction:column;gap:10px;}
+  .fs-action-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:8px;border:2px solid var(--tl-gray-100);}
+  .fs-action-item.done{border-color:var(--tl-green);background:var(--tl-green-light);}
+  .fs-action-item.open{border-color:var(--tl-amber);background:var(--tl-amber-light);}
+  .fs-action-icon{font-size:18px;flex-shrink:0;}
+  .fs-action-text{font-size:13px;font-weight:600;flex:1;}
+  .fs-action-resp{font-size:11px;color:var(--tl-gray-500);}
+  @media(max-width:768px){.fs-kpi-row{grid-template-columns:1fr 1fr}.fs-s-grid{grid-template-columns:1fr 1fr}}
+
+  /* ── DASHBOARD FILTERS ── */
+  .dash-filters{background:var(--tl-white);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:14px 20px;margin-bottom:24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+  .dash-filter-label{font-size:11px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;}
+  .dash-filter-divider{width:1px;height:24px;background:var(--tl-gray-100);flex-shrink:0;}
+  .dash-filter-info{margin-left:auto;font-size:12px;color:var(--tl-gray-500);font-weight:600;}
+  @media(max-width:768px){.dash-filters{gap:10px}.dash-filter-info{margin-left:0}}
+
+  /* ── COMING SOON ── */
+  .coming-soon-wrap{max-width:600px;margin:60px auto;text-align:center;}
+  .coming-soon-icon{font-size:72px;margin-bottom:24px;opacity:0.7;}
+  .coming-soon-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:40px;text-transform:uppercase;color:var(--tl-black);margin-bottom:8px;}
+  .coming-soon-sub{color:var(--tl-gray-500);font-size:16px;margin-bottom:32px;line-height:1.6;}
+  .coming-soon-features{background:var(--tl-white);border-radius:var(--radius);padding:24px 28px;text-align:left;box-shadow:var(--shadow-sm);margin-bottom:28px;}
+  .coming-soon-features-title{font-size:11px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;}
+  .coming-feature{display:flex;align-items:center;gap:12px;padding:8px 0;font-size:14px;font-weight:500;border-bottom:1px solid var(--tl-gray-100);}
+  .coming-feature:last-child{border-bottom:none;}
+  .coming-feature-icon{font-size:18px;}
+
+  /* ── DB OVERLAY ── */
+  .db-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:200;justify-content:center;align-items:flex-start;padding:40px 20px;overflow-y:auto;}
+  .db-overlay.active{display:flex;}
+  .db-panel{background:var(--tl-white);border-radius:16px;box-shadow:var(--shadow-xl);width:100%;max-width:1200px;overflow:hidden;animation:fadeInUp 0.3s ease;}
+  .db-header{background:var(--tl-black);padding:20px 28px;display:flex;align-items:center;justify-content:space-between;}
+  .db-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:var(--tl-white);text-transform:uppercase;}
+  .db-subtitle{font-size:13px;color:var(--tl-gray-500);}
+  .db-close{background:none;border:none;color:var(--tl-gray-500);font-size:28px;cursor:pointer;}
+  .db-close:hover{color:var(--tl-white);}
+  .db-tabs{display:flex;border-bottom:2px solid var(--tl-gray-100);padding:0 28px;gap:4px;}
+  .db-tab{padding:14px 20px;font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;color:var(--tl-gray-500);background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;transition:all 0.2s;text-transform:uppercase;}
+  .db-tab:hover{color:var(--tl-black);}
+  .db-tab.active{color:var(--tl-red);border-bottom-color:var(--tl-red);}
+  .db-content{padding:24px 28px;max-height:60vh;overflow-y:auto;}
+  .db-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .db-table thead th{text-align:left;font-size:11px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;padding:10px 12px;border-bottom:2px solid var(--tl-gray-100);white-space:nowrap;position:sticky;top:0;background:var(--tl-white);}
+  .db-table tbody td{padding:10px 12px;border-bottom:1px solid var(--tl-gray-100);font-variant-numeric:tabular-nums;}
+  .db-table tbody tr:hover{background:var(--tl-gray-100);}
+  .db-empty{text-align:center;padding:60px 20px;color:var(--tl-gray-500);}
+  .db-empty-icon{font-size:48px;margin-bottom:16px;opacity:0.4;}
+  .db-empty-text{font-size:16px;font-weight:500;}
+  .db-count{font-size:12px;color:var(--tl-gray-500);padding:12px 28px;border-top:1px solid var(--tl-gray-100);text-align:right;}
+
+  @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .animate-in{animation:fadeInUp 0.4s ease forwards;}
+  .screen{display:none;}
+  .screen.active{display:block;}
+  .module{display:none;}
+  .module.active{display:block;}
+
+  @media(max-width:768px){
+    .header{padding:0 16px}.main{padding:20px 16px 80px}
+    .form-meta-grid{grid-template-columns:1fr 1fr}.product-grid{grid-template-columns:repeat(2,1fr)}
+    .steps-container{overflow-x:auto;justify-content:flex-start;padding:12px 16px}.step-label{display:none}
+    .screen-title{font-size:24px}.control-input{width:90px}
+    .dash-row{grid-template-columns:1fr}.modules-grid{grid-template-columns:1fr}
+    .header-subtitle{display:none}.module-crumb{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo-mark">TL</div>
+    <div>
+      <div class="header-title">Quality Control Kiosk</div>
+      <div class="header-subtitle">Inspection System</div>
+    </div>
+    <div class="module-crumb" id="moduleCrumb"></div>
+  </div>
+  <div class="header-right">
+    <div style="background:#7C3AED;color:#fff;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-left:8px">&#127381; Modo Demo</div>
+    <div class="header-badge" id="buBadge" style="display:none">CHL</div>
+    <button class="btn-home" id="btnHome" onclick="goHome()">&#8592; Panel</button>
+    <button class="db-tab-btn" id="dbTabBtn" style="display:none" onclick="toggleDBView()">&#128202; Base de Datos</button>
+    <div class="header-time" id="clock">--:--:--</div>
+  </div>
+</div>
+
+<!-- ── LPF STEPS / PROGRESS (only shown inside LPF module) ── -->
+<div id="lpfNav">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:25%"></div></div>
+  <div class="steps-container">
+    <div class="step-item active" id="step1"><div class="step-number">1</div><div class="step-label">Unidad de Negocio</div></div><div class="step-arrow">›</div>
+    <div class="step-item pending" id="step2"><div class="step-number">2</div><div class="step-label">Producto</div></div><div class="step-arrow">›</div>
+    <div class="step-item pending" id="step3"><div class="step-number">3</div><div class="step-label">Inspección</div></div><div class="step-arrow">›</div>
+    <div class="step-item pending" id="step4"><div class="step-number">4</div><div class="step-label">Resultado</div></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ══════════════════════════════════
+       PANEL HOME
+  ══════════════════════════════════ -->
+  <div class="module active" id="modulePanel">
+    <div class="panel-hero animate-in">
+      <div class="panel-hero-title">Módulos del Sistema</div>
+      <div class="panel-hero-sub">Selecciona un módulo para comenzar</div>
+    </div>
+    <div class="modules-grid">
+      <!-- Liberación de Primera Pieza -->
+      <div class="module-card color-red animate-in" onclick="openModule('lpf')">
+        <div class="module-card-icon">&#9989;</div>
+        <div class="module-card-name">Liberación de Primera Pieza</div>
+        <div class="module-card-desc">Inspección dimensional y funcional de primera pieza con controles numéricos y variables. Genera ticket de liberación y registra en base de datos.</div>
+        <div class="module-card-badge badge-active"><span class="badge-dot"></span>Activo — CHL</div>
+      </div>
+      <!-- Dashboard -->
+      <div class="module-card color-blue animate-in" onclick="openModule('dashboard')">
+        <div class="module-card-icon">&#128202;</div>
+        <div class="module-card-name">Dashboard</div>
+        <div class="module-card-desc">Visualización de indicadores clave de calidad: tasa de aprobación, productos con más fallas, tendencias por turno y resumen de inspecciones.</div>
+        <div class="module-card-badge badge-active"><span class="badge-dot"></span>Activo — Demo</div>
+      </div>
+      <!-- Gestión de Reclamos -->
+      <div class="module-card color-teal animate-in" onclick="openModule('gestion')">
+        <div class="module-card-icon">&#128680;</div>
+        <div class="module-card-name">Gestión de Reclamos</div>
+        <div class="module-card-desc">Alertas de calidad activas y contenciones en proceso. Seguimiento en tiempo real de no conformidades y acciones correctivas.</div>
+        <div class="module-card-badge badge-active"><span class="badge-dot"></span>Activo — <span id="panelAlertCount">3 alertas abiertas</span></div>
+      </div>
+      <!-- 8Ds -->
+      <div class="module-card color-green animate-in" onclick="openModule('eightd')">
+        <div class="module-card-icon">&#128295;</div>
+        <div class="module-card-name">8Ds — Solución de Problemas</div>
+        <div class="module-card-desc">Reportes 8D activos vinculados a no conformidades. Seguimiento por disciplina, responsable y fecha de cierre.</div>
+        <div class="module-card-badge badge-active"><span class="badge-dot"></span>Activo — <span id="panel8dCount">2 abiertos</span></div>
+      </div>
+      <!-- Reclamaciones de Cliente -->
+      <div class="module-card color-purple animate-in disabled">
+        <div class="module-card-icon">&#128221;</div>
+        <div class="module-card-name">Reclamaciones de Cliente</div>
+        <div class="module-card-desc">Registro y seguimiento de reclamaciones externas, vinculación con inspecciones de primera pieza y análisis de causa raíz (8D).</div>
+        <div class="module-card-badge badge-soon">Próximamente</div>
+      </div>
+      <!-- LPAs -->
+      <div class="module-card color-amber animate-in disabled">
+        <div class="module-card-icon">&#128203;</div>
+        <div class="module-card-name">LPAs</div>
+        <div class="module-card-desc">Layered Process Audits: auditorías por capas para verificar el cumplimiento de estándares de proceso en línea de producción.</div>
+        <div class="module-card-badge badge-soon">Próximamente</div>
+      </div>
+      <!-- 5S -->
+      <div class="module-card color-orange animate-in" onclick="openModule('fives')">
+        <div class="module-card-icon">&#129529;</div>
+        <div class="module-card-name">5S — Auditorías de Orden y Limpieza</div>
+        <div class="module-card-desc">Registro y seguimiento de auditorías 5S por línea de producción. Calificación por disciplina, acciones correctivas y tendencias.</div>
+        <div class="module-card-badge badge-active"><span class="badge-dot"></span>Activo — <span id="panel5sCount">4 auditorías este mes</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       MÓDULO: LIBERACIÓN PRIMERA PIEZA
+  ══════════════════════════════════ -->
+  <div class="module" id="moduleLPF">
+    <div class="screen active" id="screen1">
+      <div class="screen-title animate-in">Selecciona Unidad de Negocio</div>
+      <div class="screen-desc animate-in">Elige la unidad de negocio para esta inspección</div>
+      <div class="bu-grid">
+        <div class="bu-card animate-in" onclick="selectBU('CHL')"><div class="bu-icon">&#128161;</div><div class="bu-name">CHL</div><div class="bu-desc">Commercial Headlamp Lighting</div><div class="bu-badge active">Activo — 5 productos</div></div>
+        <div class="bu-card disabled animate-in"><div class="bu-icon">&#128296;</div><div class="bu-name">RIGID</div><div class="bu-desc">Rigid Industries</div><div class="bu-badge soon">Próximamente</div></div>
+      </div>
+    </div>
+    <div class="screen" id="screen2">
+      <div class="screen-title">Selecciona Producto</div><div class="screen-desc">CHL — Commercial Headlamp Lighting</div>
+      <div class="product-grid" id="productGrid"></div>
+      <div style="margin-top:24px"><button class="btn-back" onclick="goToScreen(1)">&#8249; Cambiar Unidad</button></div>
+    </div>
+    <div class="screen" id="screen3"><div id="formContainer"></div></div>
+    <div class="screen" id="screen4"><div class="confirm-container" id="confirmContainer"></div></div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       MÓDULO: DASHBOARD
+  ══════════════════════════════════ -->
+  <div class="module" id="moduleDashboard">
+    <div class="screen-title animate-in">Dashboard</div>
+    <div class="screen-desc animate-in">Indicadores de Liberación de Primera Pieza — Datos demo</div>
+
+    <!-- Filtros -->
+    <div class="dash-filters">
+      <span class="dash-filter-label">BU</span>
+      <div id="dashBUChips" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      <div class="dash-filter-divider"></div>
+      <span class="dash-filter-label">Mes</span>
+      <div id="dashMesChips" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      <span class="dash-filter-info" id="dashFilterInfo"></span>
+    </div>
+
+    <!-- KPIs -->
+    <div class="dash-kpi-grid" id="dashKPIs"></div>
+
+    <!-- Row 1: Donut + Bar por producto -->
+    <div class="dash-row">
+      <div class="dash-card animate-in">
+        <div class="dash-card-header">
+          <div><div class="dash-card-title">Resultado Global</div><div class="dash-card-sub">Distribución de inspecciones</div></div>
+        </div>
+        <div class="dash-card-body" id="dashDonut"></div>
+      </div>
+      <div class="dash-card animate-in">
+        <div class="dash-card-header">
+          <div><div class="dash-card-title">Inspecciones por Producto</div><div class="dash-card-sub">Total de registros</div></div>
+        </div>
+        <div class="dash-card-body" id="dashByProduct"></div>
+      </div>
+    </div>
+
+    <!-- Row 2: Bar por turno + Bar controles fallidos -->
+    <div class="dash-row">
+      <div class="dash-card animate-in">
+        <div class="dash-card-header">
+          <div><div class="dash-card-title">Tasa de Aprobación por Turno</div><div class="dash-card-sub">% PASS</div></div>
+        </div>
+        <div class="dash-card-body" id="dashByShift"></div>
+      </div>
+      <div class="dash-card animate-in">
+        <div class="dash-card-header">
+          <div><div class="dash-card-title">Controles con más Fallas</div><div class="dash-card-sub">Frecuencia de fallo</div></div>
+        </div>
+        <div class="dash-card-body" id="dashFailedControls"></div>
+      </div>
+    </div>
+
+    <!-- Row 3: Tabla reciente -->
+    <div class="dash-row single">
+      <div class="dash-card animate-in">
+        <div class="dash-card-header">
+          <div><div class="dash-card-title">Últimas Inspecciones</div><div class="dash-card-sub">Registros recientes del sistema</div></div>
+        </div>
+        <div class="dash-card-body" id="dashRecent"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       MÓDULO: RECLAMACIONES DE CLIENTE
+  ══════════════════════════════════ -->
+  <div class="module" id="moduleReclamaciones">
+    <div class="coming-soon-wrap animate-in">
+      <div class="coming-soon-icon">&#128221;</div>
+      <div class="coming-soon-title">Reclamaciones de Cliente</div>
+      <div class="coming-soon-sub">Este módulo está en desarrollo. Permitirá registrar y dar seguimiento a reclamaciones externas vinculadas a los datos de primera pieza.</div>
+      <div class="coming-soon-features">
+        <div class="coming-soon-features-title">Funcionalidades planeadas</div>
+        <div class="coming-feature"><span class="coming-feature-icon">&#128279;</span>Vinculación con registros de Liberación de Primera Pieza</div>
+        <div class="coming-feature"><span class="coming-feature-icon">&#128196;</span>Formato de reporte 8D integrado</div>
+        <div class="coming-feature"><span class="coming-feature-icon">&#128101;</span>Asignación de responsable y fechas de cierre</div>
+        <div class="coming-feature"><span class="coming-feature-icon">&#128200;</span>Dashboard de reclamaciones abiertas vs cerradas</div>
+        <div class="coming-feature"><span class="coming-feature-icon">&#9993;</span>Notificaciones automáticas al equipo de calidad</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       MÓDULO: LPAs
+  ══════════════════════════════════ -->
+  <div class="module" id="moduleLPAs">
+    <div class="coming-soon-wrap animate-in">
+      <div class="coming-soon-icon">&#128203;</div>
+      <div class="coming-soon-title">LPAs — Layered Process Audits</div>
+      <div class="coming-soon-sub">Módulo en desarrollo para auditorías por capas. Permite verificar el cumplimiento de estándares de proceso en distintos niveles de la organización.</div>
+      <div class="coming-soon-features">
+        <div class="coming-soon-features-title">Funcionalidades planeadas</div>
+        <div class="coming-feature"><span class="coming-feature-icon">&#128203;</span>Checklists configurables por estación de trabajo</div>
+        <div class="coming-feature"><span class="coming-feature-icon">&#127970;</span>Auditorías por nivel: operador, supervisor, gerencia</div>
+        <div class="coming-feature"><span class="coming-feature-icon">&#128197;</span>Programación y frecuencia de auditorías</div>
+        <div class="coming-feature"><span class="coming-feature-icon">&#128200;</span>Reporte de cumplimiento y tendencias</div>
+        <div class="coming-feature"><span class="coming-feature-icon">&#9888;</span>Escalación automática de hallazgos críticos</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       MÓDULO: GESTIÓN DE RECLAMOS
+  ══════════════════════════════════ -->
+  <div class="module" id="moduleGestion">
+    <div class="screen-title animate-in">Gestión de Reclamos</div>
+    <div class="screen-desc animate-in">Alertas de calidad activas y contenciones en proceso</div>
+
+    <!-- KPIs -->
+    <div class="gr-kpi-row" id="grKPIs"></div>
+
+    <!-- Filtros -->
+    <div class="gr-filters animate-in">
+      <div class="gr-filter-label">BU</div>
+      <div class="gr-filter-group" id="grFilterBU">
+        <div class="gr-chip active" data-bu="all" onclick="setGrFilter('bu','all')">Todas</div>
+        <div class="gr-chip" data-bu="CHL" onclick="setGrFilter('bu','CHL')">CHL</div>
+        <div class="gr-chip" data-bu="RIGID" onclick="setGrFilter('bu','RIGID')">RIGID</div>
+      </div>
+      <div class="gr-divider"></div>
+      <div class="gr-filter-label">Estatus</div>
+      <div class="gr-filter-group" id="grFilterStatus">
+        <div class="gr-chip active" data-st="all" onclick="setGrFilter('status','all')">Todos</div>
+        <div class="gr-chip chip-abierta" data-st="abierta" onclick="setGrFilter('status','abierta')">Abierta</div>
+        <div class="gr-chip chip-investigacion" data-st="investigacion" onclick="setGrFilter('status','investigacion')">En Investigación</div>
+        <div class="gr-chip chip-cerrada" data-st="cerrada" onclick="setGrFilter('status','cerrada')">Cerrada</div>
+      </div>
+      <div class="gr-results-info" id="grResultsInfo"></div>
+    </div>
+
+    <!-- Alertas + Contenciones -->
+    <div class="gr-grid">
+      <div class="gr-card animate-in">
+        <div class="gr-card-header">
+          <div class="gr-card-title">&#128680; Alertas de Calidad</div>
+          <div class="gr-count-badge" id="grAlertBadge">—</div>
+        </div>
+        <div class="gr-list" id="grAlertList"></div>
+      </div>
+      <div class="gr-card animate-in">
+        <div class="gr-card-header">
+          <div class="gr-card-title">&#9203; Contenciones Activas</div>
+          <div class="gr-count-badge amber" id="grContBadge">—</div>
+        </div>
+        <div class="gr-list" id="grContList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       MÓDULO: 8Ds
+  ══════════════════════════════════ -->
+  <div class="module" id="module8D">
+    <div class="screen-title animate-in">8Ds — Solución de Problemas</div>
+    <div class="screen-desc animate-in">Reportes 8D activos y cerrados</div>
+    <div class="eightd-kpi-row" id="edKPIs"></div>
+    <div class="eightd-list" id="edList"></div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       MÓDULO: 5S
+  ══════════════════════════════════ -->
+  <div class="module" id="module5S">
+    <div class="screen-title animate-in">5S — Auditorías de Orden y Limpieza</div>
+    <div class="screen-desc animate-in">Registro y seguimiento de auditorías por línea de producción</div>
+    <div class="fs-kpi-row" id="fsKPIs"></div>
+    <div class="fs-filters" id="fsFilters">
+      <span class="fs-filter-label">Línea</span>
+      <div id="fsLineas" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      <div style="width:1px;height:24px;background:var(--tl-gray-100);flex-shrink:0;"></div>
+      <span class="fs-filter-label">Estatus</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="fs-chip active" data-fs-st="all" onclick="setFsFilter('st','all',this)">Todos</span>
+        <span class="fs-chip chip-aprobada" data-fs-st="aprobada" onclick="setFsFilter('st','aprobada',this)">Aprobada</span>
+        <span class="fs-chip chip-observaciones" data-fs-st="observaciones" onclick="setFsFilter('st','observaciones',this)">Con Observaciones</span>
+        <span class="fs-chip chip-reprobada" data-fs-st="reprobada" onclick="setFsFilter('st','reprobada',this)">Reprobada</span>
+      </div>
+      <span class="gr-results-info" id="fsResultsInfo"></span>
+    </div>
+    <div class="fs-table-wrap">
+      <table class="fs-table">
+        <thead>
+          <tr>
+            <th>Folio</th><th>Línea</th><th>Auditor</th><th>Fecha</th>
+            <th>Seiri</th><th>Seiton</th><th>Seiso</th><th>Seiketsu</th><th>Shitsuke</th>
+            <th>Total</th><th>Estatus</th>
+          </tr>
+        </thead>
+        <tbody id="fsTableBody"></tbody>
+      </table>
+    </div>
+    <div id="fsDetailWrap"></div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ── REPORTE DE CONTENCIÓN MODAL ── -->
+<div class="rpt-overlay" id="rptOverlay" onclick="if(event.target===this)closeContencionReport()">
+  <div class="rpt-panel" id="rptPanel"></div>
+</div>
+
+<!-- ── DB OVERLAY ── -->
+<div class="db-overlay" id="dbOverlay" onclick="if(event.target===this)toggleDBView()">
+  <div class="db-panel">
+    <div class="db-header"><div><div class="db-title">&#128202; Base de Datos — Inspecciones</div><div class="db-subtitle">Registros almacenados en el sistema</div></div><button class="db-close" onclick="toggleDBView()">×</button></div>
+    <div class="db-tabs">
+      <button class="db-tab active" onclick="switchDBTab('inspections',this)">Inspecciones</button>
+      <button class="db-tab" onclick="switchDBTab('results',this)">Resultados Detalle</button>
+      <button class="db-tab" onclick="switchDBTab('products',this)">Productos</button>
+      <button class="db-tab" onclick="switchDBTab('controls',this)">Controles</button>
+    </div>
+    <div class="db-content" id="dbContent"></div>
+    <div class="db-count" id="dbCount"></div>
+  </div>
+</div>
+
+<script>
+/* ── DATA ── */
+/* ── API ── */
+/* Demo mode — no API */
+
+let currentScreen=1,selectedBU=null,selectedProduct=null,controlValues={};
+
+/* ════════════════════════════════════════════
+   DEMO MODE — productos y controles hardcodeados
+════════════════════════════════════════════ */
+const DEMO_PRODUCTS=[
+  {id:1,name:'Headlamp 920L',part_number:'TL-920-L',bu_code:'CHL',business_unit_id:1},
+  {id:2,name:'Headlamp 920R',part_number:'TL-920-R',bu_code:'CHL',business_unit_id:1},
+  {id:3,name:'Headlamp 120L',part_number:'TL-120-L',bu_code:'CHL',business_unit_id:1},
+  {id:4,name:'Headlamp 120R',part_number:'TL-120-R',bu_code:'CHL',business_unit_id:1},
+  {id:5,name:'Headlamp 800', part_number:'TL-800-C',bu_code:'CHL',business_unit_id:1},
+];
+function _ctrl(pid,bid,name,type,unit,lsl,usl,target,ord){
+  return{id:bid,product_id:pid,name,type,unit,lsl,usl,target,sort_order:ord,active:1};
+}
+const DEMO_CONTROLS={
+  1:[_ctrl(1, 1,'Diametro Lente','numeric','mm',119.5,120.5,120.0,1),
+     _ctrl(1, 2,'Ancho Housing', 'numeric','mm', 74.0, 76.0, 75.0,2),
+     _ctrl(1, 3,'Amperaje',      'numeric','A',   2.8,  3.2,  3.0,3),
+     _ctrl(1, 4,'Torque',        'numeric','Nm',  2.5,  3.5,  3.0,4),
+     _ctrl(1, 5,'Cosmetica',  'variable',null,null,null,null,5),
+     _ctrl(1, 6,'Sellado',    'variable',null,null,null,null,6),
+     _ctrl(1, 7,'LED',        'variable',null,null,null,null,7)],
+  2:[_ctrl(2, 8,'Diametro Lente','numeric','mm',119.5,120.5,120.0,1),
+     _ctrl(2, 9,'Ancho Housing', 'numeric','mm', 74.0, 76.0, 75.0,2),
+     _ctrl(2,10,'Amperaje',      'numeric','A',   2.8,  3.2,  3.0,3),
+     _ctrl(2,11,'Torque',        'numeric','Nm',  2.5,  3.5,  3.0,4),
+     _ctrl(2,12,'Cosmetica',  'variable',null,null,null,null,5),
+     _ctrl(2,13,'Sellado',    'variable',null,null,null,null,6),
+     _ctrl(2,14,'LED',        'variable',null,null,null,null,7)],
+  3:[_ctrl(3,15,'Diametro Lente','numeric','mm',119.5,120.5,120.0,1),
+     _ctrl(3,16,'Ancho Housing', 'numeric','mm', 74.0, 76.0, 75.0,2),
+     _ctrl(3,17,'Amperaje',      'numeric','A',   2.8,  3.2,  3.0,3),
+     _ctrl(3,18,'Torque',        'numeric','Nm',  2.5,  3.5,  3.0,4),
+     _ctrl(3,19,'Cosmetica',  'variable',null,null,null,null,5),
+     _ctrl(3,20,'Sellado',    'variable',null,null,null,null,6),
+     _ctrl(3,21,'LED',        'variable',null,null,null,null,7)],
+  4:[_ctrl(4,22,'Diametro Lente','numeric','mm',119.5,120.5,120.0,1),
+     _ctrl(4,23,'Ancho Housing', 'numeric','mm', 74.0, 76.0, 75.0,2),
+     _ctrl(4,24,'Amperaje',      'numeric','A',   2.8,  3.2,  3.0,3),
+     _ctrl(4,25,'Torque',        'numeric','Nm',  2.5,  3.5,  3.0,4),
+     _ctrl(4,26,'Cosmetica',  'variable',null,null,null,null,5),
+     _ctrl(4,27,'Sellado',    'variable',null,null,null,null,6),
+     _ctrl(4,28,'LED',        'variable',null,null,null,null,7)],
+  5:[_ctrl(5,29,'Diametro Lente','numeric','mm',159.5,160.5,160.0,1),
+     _ctrl(5,30,'Ancho Housing', 'numeric','mm', 99.0,101.0,100.0,2),
+     _ctrl(5,31,'Amperaje',      'numeric','A',   4.8,  5.2,  5.0,3),
+     _ctrl(5,32,'Torque',        'numeric','Nm',  2.5,  3.5,  3.0,4),
+     _ctrl(5,33,'Cosmetica',  'variable',null,null,null,null,5),
+     _ctrl(5,34,'Sellado',    'variable',null,null,null,null,6),
+     _ctrl(5,35,'LED',        'variable',null,null,null,null,7)],
+};
+const db_inspections=[],db_results=[];
+let inspId=1,resId=1;
+
+/* Demo data for dashboard (simulates a populated database) */
+const demo_inspections=[
+  /* ── Abril 2026 – CHL ── */
+  {id:'D01',folio:'TL-20260414-A1B2C3',fecha:'14/04/2026',hora:'06:18',bu:'CHL',product:'Headlamp 920L',pn:'TL-920-L',num_operador:'OP-001',operador:'Juan Rodríguez',turno:1,lote:'L-2026-041',resultado:'PASS',pass_count:7,fail_count:0,contencion:null},
+  {id:'D02',folio:'TL-20260414-D4E5F6',fecha:'14/04/2026',hora:'06:45',bu:'CHL',product:'Headlamp 920R',pn:'TL-920-R',num_operador:'OP-002',operador:'María López',turno:1,lote:'L-2026-041',resultado:'PASS',pass_count:7,fail_count:0,contencion:null},
+  {id:'D03',folio:'TL-20260414-G7H8I9',fecha:'14/04/2026',hora:'07:10',bu:'CHL',product:'Headlamp 120L',pn:'TL-120-L',num_operador:'OP-003',operador:'Carlos Vega',turno:1,lote:'L-2026-042',resultado:'CONDITIONAL',pass_count:6,fail_count:1,contencion:'Se segregó pieza. Reajuste de torquímetro. Supervisó auditor QA-05.'},
+  {id:'D04',folio:'TL-20260414-J1K2L3',fecha:'14/04/2026',hora:'08:30',bu:'CHL',product:'Headlamp 800',pn:'TL-800-C',num_operador:'OP-001',operador:'Juan Rodríguez',turno:1,lote:'L-2026-043',resultado:'PASS',pass_count:7,fail_count:0,contencion:null},
+  {id:'D05',folio:'TL-20260414-M4N5O6',fecha:'14/04/2026',hora:'14:05',bu:'CHL',product:'Headlamp 920L',pn:'TL-920-L',num_operador:'OP-004',operador:'Ana Soto',turno:2,lote:'L-2026-044',resultado:'PASS',pass_count:7,fail_count:0,contencion:null},
+  {id:'D06',folio:'TL-20260414-P7Q8R9',fecha:'14/04/2026',hora:'14:55',bu:'CHL',product:'Headlamp 120R',pn:'TL-120-R',num_operador:'OP-005',operador:'Luis Méndez',turno:2,lote:'L-2026-044',resultado:'CONDITIONAL',pass_count:5,fail_count:2,contencion:'Dos controles fuera de spec. Lote completo en cuarentena. Análisis 8D iniciado.'},
+  {id:'D07',folio:'TL-20260414-S1T2U3',fecha:'14/04/2026',hora:'15:20',bu:'CHL',product:'Headlamp 920R',pn:'TL-920-R',num_operador:'OP-004',operador:'Ana Soto',turno:2,lote:'L-2026-045',resultado:'PASS',pass_count:7,fail_count:0,contencion:null},
+  {id:'D08',folio:'TL-20260414-V4W5X6',fecha:'14/04/2026',hora:'22:10',bu:'CHL',product:'Headlamp 800',pn:'TL-800-C',num_operador:'OP-006',operador:'Pedro Ruiz',turno:3,lote:'L-2026-046',resultado:'PASS',pass_count:7,fail_count:0,contencion:null},
+  {id:'D09',folio:'TL-20260415-Y7Z8A9',fecha:'15/04/2026',hora:'06:12',bu:'CHL',product:'Headlamp 120L',pn:'TL-120-L',num_operador:'OP-001',operador:'Juan Rodríguez',turno:1,lote:'L-2026-047',resultado:'PASS',pass_count:7,fail_count:0,contencion:null},
+  {id:'D10',folio:'TL-20260415-B1C2D3',fecha:'15/04/2026',hora:'06:50',bu:'CHL',product:'Headlamp 920L',pn:'TL-920-L',num_operador:'OP-002',operador:'María López',turno:1,lote:'L-2026-047',resultado:'CONDITIONAL',pass_count:6,fail_count:1,contencion:'Amperaje ligeramente bajo. Fuente calibrada. Liberación autorizada por QA-02.'},
+  /* ── Marzo 2026 – CHL ── */
+  {id:'D11',folio:'TL-20260328-C4D5E6',fecha:'28/03/2026',hora:'06:22',bu:'CHL',product:'Headlamp 920L',pn:'TL-920-L',num_operador:'OP-001',operador:'Juan Rodríguez',turno:1,lote:'L-2026-031',resultado:'PASS',pass_count:7,fail_count:0,contencion:null},
+  {id:'D12',folio:'TL-20260328-F7G8H9',fecha:'28/03/2026',hora:'07:05',bu:'CHL',product:'Headlamp 120R',pn:'TL-120-R',num_operador:'OP-003',operador:'Carlos Vega',turno:1,lote:'L-2026-031',resultado:'PASS',pass_count:7,fail_count:0,contencion:null},
+  {id:'D13',folio:'TL-20260328-I1J2K3',fecha:'28/03/2026',hora:'14:30',bu:'CHL',product:'Headlamp 800',pn:'TL-800-C',num_operador:'OP-005',operador:'Luis Méndez',turno:2,lote:'L-2026-032',resultado:'CONDITIONAL',pass_count:5,fail_count:2,contencion:'Fuga de sellado detectada. Pieza segregada. Proveedor notificado.'},
+  {id:'D14',folio:'TL-20260329-L4M5N6',fecha:'29/03/2026',hora:'06:40',bu:'CHL',product:'Headlamp 920R',pn:'TL-920-R',num_operador:'OP-002',operador:'María López',turno:1,lote:'L-2026-033',resultado:'PASS',pass_count:7,fail_count:0,contencion:null},
+  {id:'D15',folio:'TL-20260330-O7P8Q9',fecha:'30/03/2026',hora:'22:15',bu:'CHL',product:'Headlamp 120L',pn:'TL-120-L',num_operador:'OP-006',operador:'Pedro Ruiz',turno:3,lote:'L-2026-034',resultado:'PASS',pass_count:7,fail_count:0,contencion:null},
+  /* ── Marzo 2026 – RIGID ── */
+  {id:'D16',folio:'RG-20260325-A1B2C3',fecha:'25/03/2026',hora:'07:10',bu:'RIGID',product:'LED Bar 20"',pn:'RG-LB-020',num_operador:'OP-R01',operador:'Sofia Herrera',turno:1,lote:'R-2026-011',resultado:'PASS',pass_count:6,fail_count:0,contencion:null},
+  {id:'D17',folio:'RG-20260325-D4E5F6',fecha:'25/03/2026',hora:'08:00',bu:'RIGID',product:'LED Bar 40"',pn:'RG-LB-040',num_operador:'OP-R02',operador:'Marco Jiménez',turno:1,lote:'R-2026-011',resultado:'PASS',pass_count:6,fail_count:0,contencion:null},
+  {id:'D18',folio:'RG-20260326-G7H8I9',fecha:'26/03/2026',hora:'14:20',bu:'RIGID',product:'LED Bar 20"',pn:'RG-LB-020',num_operador:'OP-R01',operador:'Sofia Herrera',turno:2,lote:'R-2026-012',resultado:'CONDITIONAL',pass_count:5,fail_count:1,contencion:'Intensidad lumínica por debajo del mínimo en prueba de campo.'},
+  {id:'D19',folio:'RG-20260327-J1K2L3',fecha:'27/03/2026',hora:'06:55',bu:'RIGID',product:'Spot Light 6"',pn:'RG-SL-006',num_operador:'OP-R03',operador:'Diego Castro',turno:1,lote:'R-2026-013',resultado:'PASS',pass_count:6,fail_count:0,contencion:null},
+  /* ── Abril 2026 – RIGID ── */
+  {id:'D20',folio:'RG-20260410-M4N5O6',fecha:'10/04/2026',hora:'07:30',bu:'RIGID',product:'LED Bar 40"',pn:'RG-LB-040',num_operador:'OP-R02',operador:'Marco Jiménez',turno:1,lote:'R-2026-021',resultado:'PASS',pass_count:6,fail_count:0,contencion:null},
+  {id:'D21',folio:'RG-20260411-P7Q8R9',fecha:'11/04/2026',hora:'14:10',bu:'RIGID',product:'Spot Light 6"',pn:'RG-SL-006',num_operador:'OP-R03',operador:'Diego Castro',turno:2,lote:'R-2026-022',resultado:'PASS',pass_count:6,fail_count:0,contencion:null},
+];
+const demo_alertas=[
+  {id:'ALT-001',titulo:'Amperaje fuera de spec — línea 3',severidad:'critica',status:'abierta',producto:'Headlamp 920L',lote:'L-2026-041',fecha:'14/04/2026',responsable:'QA-05 / J. Rodríguez',descripcion:'Amperaje medido 3.6A vs LSL 3.8A. Se detectó en 3 inspecciones consecutivas del turno 1.'},
+  {id:'ALT-002',titulo:'Torque inconsistente en ensamble housing',severidad:'mayor',status:'investigacion',producto:'Headlamp 120L',lote:'L-2026-042',fecha:'14/04/2026',responsable:'QA-02 / M. López',descripcion:'Torquímetro OP-03 fuera de calibración. Posible afectación de lotes L-2026-040 a L-2026-043.'},
+  {id:'ALT-003',titulo:'Apariencia cosmética — rayones en lente',severidad:'menor',status:'investigacion',producto:'Headlamp 800',lote:'L-2026-046',fecha:'14/04/2026',responsable:'QA-07 / A. Soto',descripcion:'Rayones superficiales detectados en 2 piezas del turno 3. Se revisará proceso de manejo.'},
+  {id:'ALT-004',titulo:'Sellado deficiente — prueba de agua',severidad:'mayor',status:'cerrada',producto:'Headlamp 120R',lote:'L-2026-038',fecha:'12/04/2026',responsable:'QA-01 / P. Ruiz',descripcion:'Falla de sellado en junta perimetral. Proveedor notificado. Lote devuelto. CERRADA.'},
+];
+const demo_contenciones=[
+  {
+    id:'CNT-001',folio:'TL-20260414-G7H8I9',status:'activa',dias:1,
+    fecha_apertura:'14/04/2026',hora_apertura:'07:10',fecha_objetivo:'17/04/2026',fecha_cierre:null,
+    numero_parte:'TL-120-L',producto:'Headlamp 120L',cliente:'Truck-Lite OEM',planta:'CHL — Chihuahua',linea:'Línea 3',turno:1,
+    lote:'L-2026-042',cantidad_producida:48,cantidad_inspeccionada:48,cantidad_ok:41,cantidad_nok:7,
+    tipo_defecto:'Dimensional',defecto:'Torque de tornillos fuera de especificación (LSL: 2.5 Nm)',
+    causa_raiz:'Torquímetro OP-03 descalibrado. Desviación detectada: ±0.8 Nm vs valor real.',
+    accion:'Se segregó pieza del flujo. Reajuste de torquímetro OP-03. Re-inspección 100% del lote en proceso.',
+    accion_correctiva:'Calibración del torquímetro OP-03 y OP-04. Verificación de equipos en línea.',
+    inspector:'Carlos Vega',num_inspector:'OP-003',responsable:'QA-05',auditor:'Ing. Martínez',
+    comentarios:'Se notificó a supervisión. Lote en cuarentena área Q1. Análisis de causa raíz en proceso.',
+    d8:[
+      {d:'D1',titulo:'Equipo de Respuesta',desc:'Equipo formado: QA-05, OP-003, Supervisor T1',done:true},
+      {d:'D2',titulo:'Descripción del Problema',desc:'Torque fuera de spec en 7 de 48 piezas. Torquímetro OP-03 descalibrado.',done:true},
+      {d:'D3',titulo:'Acción de Contención',desc:'Segregación de lote. Re-inspección 100%. Torquímetro reemplazado.',done:true},
+      {d:'D4',titulo:'Causa Raíz',desc:'Torquímetro OP-03 sin calibración desde 3 meses. Causa: falla en sistema de recordatorio.',done:false},
+      {d:'D5',titulo:'Acción Correctiva',desc:'Pendiente de definición.',done:false},
+      {d:'D6',titulo:'Implementación',desc:'—',done:false},
+      {d:'D7',titulo:'Verificación',desc:'—',done:false},
+      {d:'D8',titulo:'Cierre y Reconocimiento',desc:'—',done:false},
+    ],
+    columnas:['Diám. Lente (mm)','Ancho Housing (mm)','Amperaje (A)','Torque (Nm)','Cosmética','Sellado','LED'],
+    specs:[{lsl:119.5,usl:120.5},{lsl:74.0,usl:76.0},{lsl:2.8,usl:3.2},{lsl:2.5,usl:3.5},null,null,null],
+    muestras:[
+      {pieza:1,vals:[120.1,75.2,3.0,3.1,'PASS','PASS','PASS'],resultado:'OK'},
+      {pieza:2,vals:[119.9,74.8,2.9,2.3,'PASS','PASS','PASS'],resultado:'NOK'},
+      {pieza:3,vals:[120.2,75.0,3.1,3.3,'PASS','PASS','PASS'],resultado:'OK'},
+      {pieza:4,vals:[120.0,75.1,2.9,2.2,'PASS','PASS','PASS'],resultado:'NOK'},
+      {pieza:5,vals:[119.8,74.9,3.0,3.0,'PASS','PASS','PASS'],resultado:'OK'},
+      {pieza:6,vals:[120.1,75.3,3.1,2.4,'FAIL','PASS','PASS'],resultado:'NOK'},
+      {pieza:7,vals:[120.0,75.0,3.0,3.2,'PASS','PASS','PASS'],resultado:'OK'},
+      {pieza:8,vals:[119.9,74.7,2.8,2.1,'PASS','PASS','PASS'],resultado:'NOK'},
+      {pieza:9,vals:[120.3,75.1,3.1,3.4,'PASS','PASS','PASS'],resultado:'OK'},
+      {pieza:10,vals:[120.0,75.2,3.0,2.3,'PASS','PASS','PASS'],resultado:'NOK'},
+    ],
+  },
+  {
+    id:'CNT-002',folio:'TL-20260414-P7Q8R9',status:'activa',dias:1,
+    fecha_apertura:'14/04/2026',hora_apertura:'14:55',fecha_objetivo:'18/04/2026',fecha_cierre:null,
+    numero_parte:'TL-120-R',producto:'Headlamp 120R',cliente:'Truck-Lite OEM',planta:'CHL — Chihuahua',linea:'Línea 2',turno:2,
+    lote:'L-2026-044',cantidad_producida:36,cantidad_inspeccionada:36,cantidad_ok:34,cantidad_nok:2,
+    tipo_defecto:'Dimensional / Funcional',defecto:'Diámetro de lente y amperaje fuera de especificación',
+    causa_raiz:'En análisis. Posible variación en proveedor de lentes y ajuste de fuente de poder.',
+    accion:'Lote completo en cuarentena área Q2. Análisis 8D iniciado. Supervisor de turno notificado.',
+    accion_correctiva:'Pendiente de definición tras análisis 8D.',
+    inspector:'Luis Méndez',num_inspector:'OP-005',responsable:'QA-02',auditor:'Ing. García',
+    comentarios:'Segunda no conformidad en la misma semana. Posible problema sistémico en Línea 2.',
+    d8:[
+      {d:'D1',titulo:'Equipo de Respuesta',desc:'QA-02, OP-005, Supervisor T2, Ing. García',done:true},
+      {d:'D2',titulo:'Descripción del Problema',desc:'2 controles fuera de spec: diámetro lente 121.2 mm y amperaje 2.6 A.',done:true},
+      {d:'D3',titulo:'Acción de Contención',desc:'Lote en cuarentena. Revisión de equipos de medición en L2.',done:true},
+      {d:'D4',titulo:'Causa Raíz',desc:'En investigación.',done:false},
+      {d:'D5',titulo:'Acción Correctiva',desc:'—',done:false},
+      {d:'D6',titulo:'Implementación',desc:'—',done:false},
+      {d:'D7',titulo:'Verificación',desc:'—',done:false},
+      {d:'D8',titulo:'Cierre y Reconocimiento',desc:'—',done:false},
+    ],
+    columnas:['Diám. Lente (mm)','Ancho Housing (mm)','Amperaje (A)','Torque (Nm)','Cosmética','Sellado','LED'],
+    specs:[{lsl:119.5,usl:120.5},{lsl:74.0,usl:76.0},{lsl:2.8,usl:3.2},{lsl:2.5,usl:3.5},null,null,null],
+    muestras:[
+      {pieza:1,vals:[120.0,75.1,3.0,3.1,'PASS','PASS','PASS'],resultado:'OK'},
+      {pieza:2,vals:[121.2,75.0,2.6,'PASS','FAIL','PASS','PASS'],resultado:'NOK'},
+      {pieza:3,vals:[120.1,74.9,3.1,3.2,'PASS','PASS','PASS'],resultado:'OK'},
+      {pieza:4,vals:[119.9,75.2,2.9,2.8,'PASS','PASS','PASS'],resultado:'OK'},
+      {pieza:5,vals:[120.3,75.0,3.0,3.0,'PASS','PASS','PASS'],resultado:'OK'},
+      {pieza:6,vals:[120.1,74.8,2.6,3.1,'PASS','PASS','FAIL'],resultado:'NOK'},
+      {pieza:7,vals:[120.0,75.3,3.1,3.3,'PASS','PASS','PASS'],resultado:'OK'},
+      {pieza:8,vals:[119.8,75.0,3.0,2.9,'PASS','PASS','PASS'],resultado:'OK'},
+    ],
+  },
+  {
+    id:'CNT-003',folio:'TL-20260414-D4E5F6',status:'revision',dias:1,
+    fecha_apertura:'14/04/2026',hora_apertura:'22:10',fecha_objetivo:'16/04/2026',fecha_cierre:null,
+    numero_parte:'TL-800-C',producto:'Headlamp 800',cliente:'Truck-Lite OEM',planta:'CHL — Chihuahua',linea:'Línea 1',turno:3,
+    lote:'L-2026-046',cantidad_producida:24,cantidad_inspeccionada:24,cantidad_ok:22,cantidad_nok:2,
+    tipo_defecto:'Cosmético',defecto:'Rayones superficiales en lente — apariencia cosmética FAIL',
+    causa_raiz:'Manejo inadecuado en estación 5. Falta de protectores en charola de transporte.',
+    accion:'Revisión de proceso de manejo en estación 5. Capacitación programada para operadores T3.',
+    accion_correctiva:'Instalación de protectores de hule en charolas. Actualización de instrucción de trabajo.',
+    inspector:'Pedro Ruiz',num_inspector:'OP-006',responsable:'QA-07',auditor:'Ing. Martínez',
+    comentarios:'Defecto cosmético nivel 2. Piezas retiradas de línea para evaluación.',
+    d8:[
+      {d:'D1',titulo:'Equipo de Respuesta',desc:'QA-07, OP-006, Supervisor T3',done:true},
+      {d:'D2',titulo:'Descripción del Problema',desc:'Rayones en lente en 2 de 24 piezas. Detectado en inspección T3.',done:true},
+      {d:'D3',titulo:'Acción de Contención',desc:'Piezas segregadas. Revisión de estación 5.',done:true},
+      {d:'D4',titulo:'Causa Raíz',desc:'Charolas sin protección adecuada. Confirmado por revisión de puesto.',done:true},
+      {d:'D5',titulo:'Acción Correctiva',desc:'Protectores de hule + actualización de IT-EST-005. En proceso.',done:false},
+      {d:'D6',titulo:'Implementación',desc:'—',done:false},
+      {d:'D7',titulo:'Verificación',desc:'—',done:false},
+      {d:'D8',titulo:'Cierre y Reconocimiento',desc:'—',done:false},
+    ],
+    columnas:['Diám. Lente (mm)','Ancho Housing (mm)','Amperaje (A)','Torque (Nm)','Cosmética','Sellado','LED'],
+    specs:[{lsl:179.0,usl:181.0},{lsl:109.0,usl:111.0},{lsl:4.5,usl:5.5},{lsl:3.0,usl:4.0},null,null,null],
+    muestras:[
+      {pieza:1,vals:[180.1,110.2,5.0,3.6,'PASS','PASS','PASS'],resultado:'OK'},
+      {pieza:2,vals:[180.0,110.0,5.1,3.5,'FAIL','PASS','PASS'],resultado:'NOK'},
+      {pieza:3,vals:[179.9,109.8,4.9,3.7,'PASS','PASS','PASS'],resultado:'OK'},
+      {pieza:4,vals:[180.2,110.1,5.0,3.4,'PASS','PASS','PASS'],resultado:'OK'},
+      {pieza:5,vals:[180.0,110.3,5.2,3.6,'FAIL','PASS','PASS'],resultado:'NOK'},
+      {pieza:6,vals:[180.1,110.0,5.0,3.5,'PASS','PASS','PASS'],resultado:'OK'},
+    ],
+  },
+  {
+    id:'CNT-004',folio:'TL-20260412-Z9Y8X7',status:'cerrada',dias:3,
+    fecha_apertura:'12/04/2026',hora_apertura:'09:30',fecha_objetivo:'15/04/2026',fecha_cierre:'15/04/2026',
+    numero_parte:'TL-120-R',producto:'Headlamp 120R',cliente:'Truck-Lite OEM',planta:'CHL — Chihuahua',linea:'Línea 2',turno:1,
+    lote:'L-2026-038',cantidad_producida:60,cantidad_inspeccionada:60,cantidad_ok:60,cantidad_nok:0,
+    tipo_defecto:'Funcional',defecto:'Sellado deficiente — falla en prueba de agua (ingreso de humedad)',
+    causa_raiz:'Junta perimetral de proveedor con dureza fuera de especificación (Shore A 62 vs 70-80).',
+    accion:'Junta perimetral reemplazada. Prueba de agua superada al 100%. Lote liberado.',
+    accion_correctiva:'Cambio de proveedor de junta. Certificado de análisis requerido por lote. Lote re-inspeccionado y liberado.',
+    inspector:'María López',num_inspector:'OP-002',responsable:'QA-01',auditor:'Ing. García',
+    comentarios:'CERRADA. Lote L-2026-038 liberado el 15/04/2026. Proveedor notificado. Plan de acción 8D enviado.',
+    d8:[
+      {d:'D1',titulo:'Equipo de Respuesta',desc:'QA-01, OP-002, Compras, Proveedor Juntas S.A.',done:true},
+      {d:'D2',titulo:'Descripción del Problema',desc:'Falla en prueba de agua en 8 de 60 piezas. Ingreso de humedad por junta perimetral.',done:true},
+      {d:'D3',titulo:'Acción de Contención',desc:'Segregación de lote. Reemplazo de junta en todas las piezas.',done:true},
+      {d:'D4',titulo:'Causa Raíz',desc:'Junta fuera de spec de dureza (Shore A 62 vs 70-80). Proveedor no envió certificado.',done:true},
+      {d:'D5',titulo:'Acción Correctiva',desc:'Requerimiento de certificado por lote. Cambio a proveedor homologado.',done:true},
+      {d:'D6',titulo:'Implementación',desc:'Nuevo proveedor activo desde L-2026-039. Certificados recibidos.',done:true},
+      {d:'D7',titulo:'Verificación',desc:'Re-inspección 100% superada. 60/60 piezas OK.',done:true},
+      {d:'D8',titulo:'Cierre y Reconocimiento',desc:'Reporte 8D cerrado y archivado. Reconocimiento al equipo de QA.',done:true},
+    ],
+    columnas:['Diám. Lente (mm)','Ancho Housing (mm)','Amperaje (A)','Torque (Nm)','Cosmética','Sellado','LED'],
+    specs:[{lsl:119.5,usl:120.5},{lsl:74.0,usl:76.0},{lsl:2.8,usl:3.2},{lsl:2.5,usl:3.5},null,null,null],
+    muestras:[
+      {pieza:1,vals:[120.0,75.0,3.0,3.1,'PASS','PASS','PASS'],resultado:'OK'},
+      {pieza:2,vals:[119.9,74.9,3.1,2.9,'PASS','PASS','PASS'],resultado:'OK'},
+      {pieza:3,vals:[120.1,75.2,2.9,3.2,'PASS','PASS','PASS'],resultado:'OK'},
+      {pieza:4,vals:[120.0,75.0,3.0,3.0,'PASS','PASS','PASS'],resultado:'OK'},
+      {pieza:5,vals:[120.2,74.8,3.1,3.1,'PASS','PASS','PASS'],resultado:'OK'},
+    ],
+  },
+];
+
+const demo_failed_controls=[
+  {name:'Amperaje @ 12V',count:4,color:'red'},
+  {name:'Torque de tornillos',count:3,color:'amber'},
+  {name:'Apariencia cosmética',count:2,color:'amber'},
+  {name:'Sellado (prueba de agua)',count:1,color:'amber'},
+  {name:'Diámetro de lente',count:1,color:'amber'},
+];
+
+/* ── 8D DEMO DATA ── */
+const demo_8ds=[
+  {
+    id:'8D-2026-001',status:'open',titulo:'Amperaje fuera de spec — Headlamp 920L Línea 3',
+    producto:'Headlamp 920L',parte:'TL-920-L',lote:'L-2026-041',cliente:'Truck-Lite OEM',
+    fecha_apertura:'14/04/2026',fecha_objetivo:'28/04/2026',fecha_cierre:null,
+    responsable:'Ing. Martínez',equipo:['QA-05','OP-001','Supervisor T1','Ing. Martínez'],
+    d:[
+      {n:'D1',titulo:'Equipo de Respuesta',status:'done',resp:'Ing. Martínez',fecha:'14/04/2026',
+       desc:'Equipo formado: QA-05, OP-001, Supervisor T1, Ing. Martínez. Kick-off realizado el 14/04.'},
+      {n:'D2',titulo:'Descripción del Problema',status:'done',resp:'QA-05',fecha:'14/04/2026',
+       desc:'Amperaje medido 3.6A vs LSL 3.8A en 3 inspecciones consecutivas turno 1. Folio TL-20260414-A1B2C3.'},
+      {n:'D3',titulo:'Acción de Contención',status:'done',resp:'OP-001',fecha:'14/04/2026',
+       desc:'Segregación de lote L-2026-041. Re-inspección 100% en proceso. Fuente de poder marcada para revisión.'},
+      {n:'D4',titulo:'Causa Raíz',status:'active',resp:'Ing. Martínez',fecha:'18/04/2026',
+       desc:'En análisis. Hipótesis: variación en voltaje de alimentación de línea 3 durante turno 1 (06:00-08:00).'},
+      {n:'D5',titulo:'Acción Correctiva',status:'pending',resp:'—',fecha:'21/04/2026',desc:'Pendiente resultado D4.'},
+      {n:'D6',titulo:'Implementación',status:'pending',resp:'—',fecha:'24/04/2026',desc:'—'},
+      {n:'D7',titulo:'Verificación',status:'pending',resp:'—',fecha:'27/04/2026',desc:'—'},
+      {n:'D8',titulo:'Cierre y Reconocimiento',status:'pending',resp:'—',fecha:'28/04/2026',desc:'—'},
+    ],
+  },
+  {
+    id:'8D-2026-002',status:'progress',titulo:'Torque inconsistente — Headlamp 120L ensamble housing',
+    producto:'Headlamp 120L',parte:'TL-120-L',lote:'L-2026-042',cliente:'Truck-Lite OEM',
+    fecha_apertura:'14/04/2026',fecha_objetivo:'25/04/2026',fecha_cierre:null,
+    responsable:'Ing. García',equipo:['QA-02','OP-003','Maint-01','Ing. García'],
+    d:[
+      {n:'D1',titulo:'Equipo de Respuesta',status:'done',resp:'Ing. García',fecha:'14/04/2026',
+       desc:'Equipo: QA-02, OP-003, Mantenimiento-01, Ing. García.'},
+      {n:'D2',titulo:'Descripción del Problema',status:'done',resp:'QA-02',fecha:'14/04/2026',
+       desc:'Torque fuera de spec en 7/48 piezas lote L-2026-042. Torquímetro OP-03 descalibrado ±0.8Nm.'},
+      {n:'D3',titulo:'Acción de Contención',status:'done',resp:'OP-003',fecha:'14/04/2026',
+       desc:'Lote segregado área Q1. Torquímetro OP-03 reemplazado. Re-inspección 100% completada: 41 OK, 7 NOK.'},
+      {n:'D4',titulo:'Causa Raíz',status:'done',resp:'Maint-01',fecha:'15/04/2026',
+       desc:'Torquímetro OP-03 sin calibración por 90 días. Falla en sistema de recordatorio de calibración (hoja Excel manual).'},
+      {n:'D5',titulo:'Acción Correctiva',status:'active',resp:'Ing. García',fecha:'20/04/2026',
+       desc:'Implementar sistema digital de control de calibración. Frecuencia: mensual para torquímetros en línea.'},
+      {n:'D6',titulo:'Implementación',status:'pending',resp:'QA-02',fecha:'22/04/2026',desc:'Pendiente aprobación de sistema.'},
+      {n:'D7',titulo:'Verificación',status:'pending',resp:'—',fecha:'24/04/2026',desc:'—'},
+      {n:'D8',titulo:'Cierre y Reconocimiento',status:'pending',resp:'—',fecha:'25/04/2026',desc:'—'},
+    ],
+  },
+  {
+    id:'8D-2026-003',status:'verify',titulo:'Sellado deficiente — junta perimetral Headlamp 120R',
+    producto:'Headlamp 120R',parte:'TL-120-R',lote:'L-2026-038',cliente:'Truck-Lite OEM',
+    fecha_apertura:'12/04/2026',fecha_objetivo:'15/04/2026',fecha_cierre:null,
+    responsable:'Ing. García',equipo:['QA-01','Compras','Proveedor Juntas S.A.','Ing. García'],
+    d:[
+      {n:'D1',titulo:'Equipo de Respuesta',status:'done',resp:'Ing. García',fecha:'12/04/2026',desc:'QA-01, Compras, Proveedor Juntas S.A., Ing. García.'},
+      {n:'D2',titulo:'Descripción del Problema',status:'done',resp:'QA-01',fecha:'12/04/2026',desc:'Falla en prueba de agua en 8/60 piezas. Ingreso de humedad por junta perimetral.'},
+      {n:'D3',titulo:'Acción de Contención',status:'done',resp:'OP-002',fecha:'12/04/2026',desc:'Segregación del lote. Reemplazo de junta en todas las piezas. Re-prueba de agua: 60/60 OK.'},
+      {n:'D4',titulo:'Causa Raíz',status:'done',resp:'QA-01',fecha:'13/04/2026',desc:'Dureza de junta fuera de spec (Shore A 62 vs requerimiento 70-80). Proveedor no envió certificado de análisis.'},
+      {n:'D5',titulo:'Acción Correctiva',status:'done',resp:'Compras',fecha:'13/04/2026',desc:'Requerimiento de certificado por lote. Cambio a proveedor homologado Juntas Premium S.A.'},
+      {n:'D6',titulo:'Implementación',status:'done',resp:'Compras',fecha:'14/04/2026',desc:'Nuevo proveedor activo desde lote L-2026-039. Certificados recibidos y archivados.'},
+      {n:'D7',titulo:'Verificación',status:'active',resp:'QA-01',fecha:'15/04/2026',desc:'Re-inspección de lote L-2026-039 y L-2026-040 en proceso. Resultados preliminares positivos.'},
+      {n:'D8',titulo:'Cierre y Reconocimiento',status:'pending',resp:'Ing. García',fecha:'15/04/2026',desc:'Pendiente cierre formal.'},
+    ],
+  },
+  {
+    id:'8D-2026-004',status:'closed',titulo:'Rayones en lente cosmético — Headlamp 800 estación 5',
+    producto:'Headlamp 800',parte:'TL-800-C',lote:'L-2026-046',cliente:'Truck-Lite OEM',
+    fecha_apertura:'14/04/2026',fecha_objetivo:'17/04/2026',fecha_cierre:'15/04/2026',
+    responsable:'Ing. Martínez',equipo:['QA-07','OP-006','Prod-01','Ing. Martínez'],
+    d:[
+      {n:'D1',titulo:'Equipo de Respuesta',status:'done',resp:'Ing. Martínez',fecha:'14/04/2026',desc:'QA-07, OP-006, Producción-01, Ing. Martínez.'},
+      {n:'D2',titulo:'Descripción del Problema',status:'done',resp:'QA-07',fecha:'14/04/2026',desc:'Rayones nivel 2 en lente en 2/24 piezas T3. Cosmética FAIL.'},
+      {n:'D3',titulo:'Acción de Contención',status:'done',resp:'OP-006',fecha:'14/04/2026',desc:'Piezas segregadas. Revisión inmediata de estación 5.'},
+      {n:'D4',titulo:'Causa Raíz',status:'done',resp:'Prod-01',fecha:'14/04/2026',desc:'Charolas sin protección adecuada en est. 5. Confirmado por video de planta y revisión de puesto.'},
+      {n:'D5',titulo:'Acción Correctiva',status:'done',resp:'Prod-01',fecha:'14/04/2026',desc:'Instalación de protectores de hule en charolas. Actualización IT-EST-005.'},
+      {n:'D6',titulo:'Implementación',status:'done',resp:'Prod-01',fecha:'15/04/2026',desc:'Protectores instalados. IT actualizada y difundida a operadores T1, T2, T3.'},
+      {n:'D7',titulo:'Verificación',status:'done',resp:'QA-07',fecha:'15/04/2026',desc:'Inspección post-implementación: 0 defectos cosméticos en 30 piezas. Efectividad 100%.'},
+      {n:'D8',titulo:'Cierre y Reconocimiento',status:'done',resp:'Ing. Martínez',fecha:'15/04/2026',desc:'8D cerrado. Reconocimiento al equipo por resolución en menos de 24h. Lección aprendida documentada.'},
+    ],
+  },
+];
+
+/* ── PANEL ALERT COUNTER (live) ── */
+function updatePanelAlertCount(){
+  const open=demo_alertas.filter(a=>a.status==='abierta').length;
+  const el=document.getElementById('panelAlertCount');
+  if(el)el.textContent=open+' alerta'+(open!==1?'s':'')+' abierta'+(open!==1?'s':'');
+}
+updatePanelAlertCount();
+
+/* ── CLOCK ── */
+function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+setInterval(updateClock,1000);updateClock();
+
+/* ── MODULE NAVIGATION ── */
+function goHome(){
+  document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
+  document.getElementById('modulePanel').classList.add('active');
+  document.getElementById('lpfNav').style.display='none';
+  document.getElementById('btnHome').classList.remove('visible');
+  document.getElementById('moduleCrumb').classList.remove('visible');
+  document.getElementById('moduleCrumb').textContent='';
+  document.getElementById('buBadge').style.display='none';
+  document.getElementById('dbTabBtn').style.display='none';
+}
+
+function openModule(name){
+  document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
+  const crumb=document.getElementById('moduleCrumb');
+  document.getElementById('btnHome').classList.add('visible');
+  crumb.classList.add('visible');
+
+  if(name==='lpf'){
+    document.getElementById('moduleLPF').classList.add('active');
+    document.getElementById('lpfNav').style.display='block';
+    document.getElementById('dbTabBtn').style.display='';
+    crumb.textContent='/ Liberación de Primera Pieza';
+    goToScreen(1);
+  } else if(name==='dashboard'){
+    document.getElementById('moduleDashboard').classList.add('active');
+    document.getElementById('lpfNav').style.display='none';
+    document.getElementById('dbTabBtn').style.display='none';
+    crumb.textContent='/ Dashboard';
+    dashFilterBU='all'; dashFilterMes='all';
+    renderDashboard();
+  } else if(name==='reclamaciones'){
+    document.getElementById('moduleReclamaciones').classList.add('active');
+    document.getElementById('lpfNav').style.display='none';
+    crumb.textContent='/ Reclamaciones de Cliente';
+  } else if(name==='gestion'){
+    document.getElementById('moduleGestion').classList.add('active');
+    document.getElementById('lpfNav').style.display='none';
+    crumb.textContent='/ Gestión de Reclamos';
+    renderGestion();
+  } else if(name==='eightd'){
+    document.getElementById('module8D').classList.add('active');
+    document.getElementById('lpfNav').style.display='none';
+    crumb.textContent='/ 8Ds';
+    renderEightD();
+  } else if(name==='lpas'){
+    document.getElementById('moduleLPAs').classList.add('active');
+    document.getElementById('lpfNav').style.display='none';
+    crumb.textContent='/ LPAs';
+  } else if(name==='fives'){
+    document.getElementById('module5S').classList.add('active');
+    document.getElementById('lpfNav').style.display='none';
+    crumb.textContent='/ 5S';
+    renderFiveS();
+  }
+}
+
+/* ── LPF FLOW ── */
+function goToScreen(n){
+  document.querySelectorAll('#moduleLPF .screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen'+n).classList.add('active');currentScreen=n;
+  for(let i=1;i<=4;i++){const s=document.getElementById('step'+i);s.className='step-item '+(i<n?'completed':i===n?'active':'pending');s.querySelector('.step-number').textContent=i<n?'✓':i;}
+  document.getElementById('progressFill').style.width=(n*25)+'%';
+}
+function selectBU(bu){
+  selectedBU=bu;
+  const badge=document.getElementById('buBadge');
+  badge.textContent=bu;badge.style.display='';
+  renderProducts(bu);goToScreen(2);
+}
+function renderProducts(bu){
+  const grid=document.getElementById('productGrid');
+  const prods=DEMO_PRODUCTS.filter(p=>p.bu_code===bu);
+  grid.innerHTML=prods.map(p=>`
+    <div class="product-card animate-in" onclick="selectProduct(${p.id})">
+      <div class="product-img"><svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><ellipse cx="32" cy="32" rx="26" ry="20" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="32" cy="32" r="10" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="32" cy="32" r="4" fill="currentColor" opacity="0.3"/></svg></div>
+      <div class="product-name">${p.name}</div><div class="product-pn">${p.part_number}</div>
+      <div class="product-controls-count">${DEMO_CONTROLS[p.id].length} controles</div>
+    </div>`).join('');
+}
+function selectProduct(id){
+  controlValues={};
+  const prod=DEMO_PRODUCTS.find(p=>p.id===id);
+  const controls=DEMO_CONTROLS[id];
+  selectedProduct={...prod,controls,pn:prod.part_number};
+  renderForm();goToScreen(3);
+}
+
+function renderForm(){
+  const p=selectedProduct,nc=p.controls.filter(c=>c.type==='numeric'),vc=p.controls.filter(c=>c.type==='variable');
+  document.getElementById('formContainer').innerHTML=`<div class="form-container">
+    <div class="form-header"><div class="form-header-left"><div class="form-product-icon">&#128161;</div><div><div class="form-product-name">${p.name}</div><div class="form-product-pn">${p.pn}</div></div></div></div>
+    <div class="form-body">
+      <div class="form-section-title">Información General</div>
+      <div class="form-meta-grid">
+        <div class="form-field"><label class="form-label">No. Operador</label><input class="form-input" type="text" id="numOperador" placeholder="Ej: OP-001"></div>
+        <div class="form-field"><label class="form-label">Nombre Operador</label><input class="form-input" type="text" id="operador" placeholder="Nombre completo"></div>
+        <div class="form-field"><label class="form-label">Turno</label><select class="form-select" id="turno"><option value="">Seleccionar...</option><option value="1">Turno 1 (6:00-14:00)</option><option value="2">Turno 2 (14:00-22:00)</option><option value="3">Turno 3 (22:00-6:00)</option></select></div>
+        <div class="form-field"><label class="form-label">Lote / Serial</label><input class="form-input" type="text" id="lote" placeholder="Número de lote"></div>
+      </div>
+      ${nc.length?`<div class="form-section-title">Controles Numéricos</div><table class="control-table"><thead><tr><th>Control</th><th>Especificación</th><th>Target</th><th>Valor Medido</th><th>Status</th></tr></thead><tbody>${nc.map(c=>`<tr><td class="control-name">${c.name}</td><td class="control-spec">${c.lsl} — ${c.usl} ${c.unit}</td><td class="control-spec" style="font-weight:600;color:var(--tl-black)">${c.target} ${c.unit}</td><td><input class="control-input" type="number" step="0.1" id="ctrl_${c.id}" placeholder="${c.target}" oninput="validateNum(${c.id},${c.lsl},${c.usl})"></td><td><span class="control-status pending" id="st_${c.id}">—</span></td></tr>`).join('')}</tbody></table>`:''}
+      ${vc.length?`<div class="form-section-title" style="margin-top:28px">Controles Variables</div><table class="control-table"><thead><tr><th>Control</th><th>Resultado</th><th>Status</th></tr></thead><tbody>${vc.map(c=>`<tr><td class="control-name">${c.name}</td><td><div class="var-buttons"><button class="var-btn pass-btn" id="pb_${c.id}" onclick="setVar(${c.id},'PASS')">✓ Pass</button><button class="var-btn fail-btn" id="fb_${c.id}" onclick="setVar(${c.id},'FAIL')">✕ Fail</button></div></td><td><span class="control-status pending" id="st_${c.id}">—</span></td></tr>`).join('')}</tbody></table>`:''}
+      <div id="ncFlowArea"></div>
+    </div>
+    <div class="form-actions"><button class="btn-back" onclick="goToScreen(2)">&#8249; Cambiar Producto</button><button class="btn-submit" id="submitBtn" onclick="submit()">Registrar Inspección ›</button></div>
+  </div>`;
+}
+
+function validateNum(cid,lsl,usl){
+  const inp=document.getElementById('ctrl_'+cid),st=document.getElementById('st_'+cid),v=parseFloat(inp.value);
+  if(isNaN(v)||inp.value===''){inp.className='control-input';st.className='control-status pending';st.textContent='—';delete controlValues[cid];checkFails();return;}
+  if(v>=lsl&&v<=usl){inp.className='control-input pass';st.className='control-status pass';st.textContent='✓ PASS';controlValues[cid]={value:v,result:'PASS'};}
+  else{inp.className='control-input fail';st.className='control-status fail';st.textContent='✕ FAIL';controlValues[cid]={value:v,result:'FAIL'};}
+  checkFails();
+}
+function setVar(cid,res){
+  const st=document.getElementById('st_'+cid),pb=document.getElementById('pb_'+cid),fb=document.getElementById('fb_'+cid);
+  pb.classList.remove('selected');fb.classList.remove('selected');
+  if(res==='PASS'){pb.classList.add('selected');st.className='control-status pass';st.textContent='✓ PASS';}
+  else{fb.classList.add('selected');st.className='control-status fail';st.textContent='✕ FAIL';}
+  controlValues[cid]={value:res,result:res};checkFails();
+}
+function checkFails(){
+  const area=document.getElementById('ncFlowArea'),btn=document.getElementById('submitBtn');
+  const fails=selectedProduct.controls.filter(c=>controlValues[c.id]&&controlValues[c.id].result==='FAIL');
+  if(!fails.length){area.innerHTML='';btn.textContent='Registrar Inspección ›';btn.style.background='';return;}
+  area.innerHTML=`<div class="nc-panel">
+    <div class="nc-header"><div class="nc-header-icon">⚠️</div><div><div class="nc-header-title">Producto No Conforme Detectado</div><div class="nc-header-sub">Se requiere seguir el proceso de control de producto no conforme</div></div></div>
+    <div class="nc-body">
+      <div class="nc-failed-list"><div class="nc-failed-title">Controles fuera de especificación (${fails.length})</div>
+        ${fails.map(f=>{const cv=controlValues[f.id];const d=f.type==='numeric'?`Valor: ${cv.value} ${f.unit} | Spec: ${f.lsl}–${f.usl} ${f.unit}`:'Resultado: FAIL';return`<div class="nc-failed-item">✕ ${f.name} — <span style="color:var(--tl-gray-500);font-size:12px">${d}</span></div>`;}).join('')}
+      </div>
+      <div class="form-section-title" style="margin-top:0">Proceso de Control de Producto No Conforme</div>
+      <div class="nc-steps">
+        <div class="nc-step"><div class="nc-step-num done">1</div><div><div class="nc-step-title">Identificar</div><div class="nc-step-desc">El sistema ha identificado automáticamente ${fails.length} control(es) fuera de especificación.</div></div></div>
+        <div class="nc-step"><div class="nc-step-num done">2</div><div><div class="nc-step-title">Segregar</div><div class="nc-step-desc">Separe la pieza del flujo de producción. Coloque etiqueta roja de material no conforme.</div></div></div>
+        <div class="nc-step"><div class="nc-step-num current">3</div><div><div class="nc-step-title">Contener</div><div class="nc-step-desc">Solicite soporte del auditor de calidad. Documente la acción de contención abajo.</div></div></div>
+        <div class="nc-step"><div class="nc-step-num pending-step">4</div><div><div class="nc-step-title">Analizar</div><div class="nc-step-desc">El equipo de calidad determinará causa raíz (8D, Ishikawa, 5 Why).</div></div></div>
+        <div class="nc-step"><div class="nc-step-num pending-step">5</div><div><div class="nc-step-title">Disponer</div><div class="nc-step-desc">Decisión final: rework, scrap, concesión o uso como está (MRB).</div></div></div>
+      </div>
+      <div class="form-section-title">Acción de Contención</div>
+      <div class="form-field" style="margin-bottom:16px"><label class="form-label">Describa la acción de contención a ejecutar</label>
+        <textarea class="form-textarea" id="contencion" placeholder="Ej: Se segregó el lote completo. Se realizará re-inspección 100% del lote con calibrador verificado. Se notificó al supervisor de línea."></textarea></div>
+      <div class="nc-confirm-box">
+        <div class="nc-confirm-title">⚠️ Confirmación de Auditor de Calidad</div>
+        <div class="nc-checkbox-row" onclick="toggleChk('chk1')"><div class="nc-checkbox" id="chk1">✓</div><div class="nc-checkbox-label">Solicité soporte al auditor de calidad y revisamos la pieza juntos</div></div>
+        <div class="nc-checkbox-row" onclick="toggleChk('chk2')"><div class="nc-checkbox" id="chk2">✓</div><div class="nc-checkbox-label">El auditor de calidad autorizó la liberación condicionada</div></div>
+        <div class="nc-checkbox-row" onclick="toggleChk('chk3')"><div class="nc-checkbox" id="chk3">✓</div><div class="nc-checkbox-label">Me comprometo a ejecutar la acción de contención registrada</div></div>
+        <p style="font-size:12px;color:var(--tl-gray-500);margin-top:8px">📱 En futuras versiones, el auditor escaneará su QR de identificación para validar digitalmente.</p>
+      </div>
+    </div></div>`;
+  btn.textContent='Registrar Liberación Condicionada ›';btn.style.background='var(--tl-amber)';
+}
+function toggleChk(id){document.getElementById(id).classList.toggle('checked');}
+
+function genFolio(){const d=new Date(),r=Math.random().toString(36).substring(2,8).toUpperCase();return`TL-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}-${r}`;}
+function genQR(text){
+  const sz=140,cells=21,cs=sz/cells;let rects='',seed=0;
+  for(let i=0;i<text.length;i++)seed=(seed*31+text.charCodeAt(i))&0xFFFFFFFF;
+  function next(){seed=(seed*1103515245+12345)&0x7FFFFFFF;return seed;}
+  for(let r=0;r<7;r++)for(let c=0;c<7;c++){const on=r===0||r===6||c===0||c===6||(r>=2&&r<=4&&c>=2&&c<=4);if(on){rects+=`<rect x="${c*cs}" y="${r*cs}" width="${cs}" height="${cs}" fill="#1A1A1A"/>`;rects+=`<rect x="${(c+cells-7)*cs}" y="${r*cs}" width="${cs}" height="${cs}" fill="#1A1A1A"/>`;rects+=`<rect x="${c*cs}" y="${(r+cells-7)*cs}" width="${cs}" height="${cs}" fill="#1A1A1A"/>`;}}
+  for(let r=8;r<cells-8;r++)for(let c=8;c<cells;c++){if(next()%3===0)rects+=`<rect x="${c*cs}" y="${r*cs}" width="${cs}" height="${cs}" fill="#1A1A1A"/>`;}
+  for(let r=0;r<cells;r++)for(let c=8;c<cells-8;c++){if(r<8||r>=cells-8)continue;if(next()%3===0)rects+=`<rect x="${c*cs}" y="${r*cs}" width="${cs}" height="${cs}" fill="#1A1A1A"/>`;}
+  return`<svg viewBox="0 0 ${sz} ${sz}" width="${sz}" height="${sz}" xmlns="http://www.w3.org/2000/svg"><rect width="${sz}" height="${sz}" fill="white"/>${rects}</svg>`;
+}
+
+async function submit(){
+  const numOp=document.getElementById('numOperador').value,op=document.getElementById('operador').value,turno=document.getElementById('turno').value,lote=document.getElementById('lote').value;
+  if(!numOp||!op||!turno){alert('Completa No. Operador, Nombre y Turno');return;}
+  const total=selectedProduct.controls.length,filled=Object.keys(controlValues).length;
+  if(filled<total){alert(`Faltan ${total-filled} controles`);return;}
+  const hasFail=Object.values(controlValues).some(v=>v.result==='FAIL');
+  const contEl=document.getElementById('contencion'),contencion=contEl?contEl.value:'';
+  if(hasFail){
+    const c1=document.getElementById('chk1')?.classList.contains('checked'),c2=document.getElementById('chk2')?.classList.contains('checked'),c3=document.getElementById('chk3')?.classList.contains('checked');
+    if(!c1||!c2||!c3){alert('Confirme las 3 casillas del auditor');return;}
+    if(!contencion.trim()){alert('Registre la acción de contención');return;}
+  }
+  const result=hasFail?'CONDITIONAL':'PASS',now=new Date(),folio=genFolio();
+  const pc=Object.values(controlValues).filter(v=>v.result==='PASS').length,fc=Object.values(controlValues).filter(v=>v.result==='FAIL').length;
+
+  /* Demo mode — guardar en memoria de sesion */
+  const iid=inspId++;
+  db_inspections.push({id:iid,bu:selectedBU,product:selectedProduct.name,pn:selectedProduct.pn,num_operador:numOp,operador:op,turno:parseInt(turno),lote:lote||'N/A',fecha:now.toLocaleDateString('es-MX'),hora:now.toLocaleTimeString('es-MX'),resultado:result,folio,contencion:contencion||null,pass_count:pc,fail_count:fc});
+  selectedProduct.controls.forEach(c=>{const cv=controlValues[c.id];db_results.push({id:resId++,inspection_id:iid,control_name:c.name,control_type:c.type,spec:c.type==='numeric'?`${c.lsl}-${c.usl} ${c.unit}`:'Variable',valor:cv.value,resultado:cv.result});});
+  renderTicket(numOp,op,turno,lote,result,folio,contencion,pc,fc,iid);goToScreen(4);
+}
+function renderTicket(numOp,op,turno,lote,result,folio,contencion,pc,fc,iid){
+  const now=new Date(),isCond=result==='CONDITIONAL',cls=isCond?'conditional':'pass',label=isCond?'Liberación Condicionada':'Inspección Aprobada',icon=isCond?'⚠️':'✓';
+  document.getElementById('confirmContainer').innerHTML=`
+    <div class="confirm-icon ${cls}">${icon}</div>
+    <div class="confirm-title ${cls}">${label}</div>
+    <div class="confirm-subtitle">&#127381; Modo Demo &mdash; inspección generada en esta sesión</div>
+    <div class="ticket" style="margin-bottom:28px">
+      <div class="ticket-strip ${cls}"></div>
+      <div class="ticket-body">
+        <div class="ticket-logo">Truck-Lite — Quality Control</div>
+        <div class="ticket-status ${cls}">${isCond?'Liberación Condicionada':'Aprobado'}</div>
+        <div class="ticket-folio">Folio: ${folio}</div>
+        <div class="ticket-qr">${genQR(folio)}</div>
+        <div class="ticket-details">
+          <div class="ticket-row"><span class="ticket-row-label">Producto</span><span class="ticket-row-value">${selectedProduct.name} (${selectedProduct.pn})</span></div>
+          <div class="ticket-row"><span class="ticket-row-label">BU</span><span class="ticket-row-value">${selectedBU}</span></div>
+          <div class="ticket-row"><span class="ticket-row-label">Operador</span><span class="ticket-row-value">${numOp} — ${op}</span></div>
+          <div class="ticket-row"><span class="ticket-row-label">Turno</span><span class="ticket-row-value">Turno ${turno}</span></div>
+          <div class="ticket-row"><span class="ticket-row-label">Lote</span><span class="ticket-row-value">${lote||'N/A'}</span></div>
+          <div class="ticket-row"><span class="ticket-row-label">Fecha / Hora</span><span class="ticket-row-value">${now.toLocaleDateString('es-MX')} ${now.toLocaleTimeString('es-MX')}</span></div>
+          <div class="ticket-row"><span class="ticket-row-label">Controles</span><span class="ticket-row-value"><span style="color:var(--tl-green)">${pc} OK</span>${fc>0?' / <span style="color:var(--tl-fail)">'+fc+' FAIL</span>':''}</span></div>
+        </div>
+        ${isCond?`<div class="ticket-condition"><div class="ticket-condition-title">Condición de Liberación</div><div class="ticket-condition-text">${contencion}</div></div>`:''}
+      </div>
+      <div class="ticket-footer">Este ticket será imprimible en versiones futuras · QR escaneable para trazabilidad</div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn-new" onclick="newInsp()">Nueva Inspección ›</button>
+      <button class="btn-back" onclick="goHome()" style="border-color:var(--tl-gray-500)">&#8962; Ir al Panel</button>
+    </div>`;
+}
+function newInsp(){controlValues={};goToScreen(1);}
+
+/* ── DB OVERLAY ── */
+function toggleDBView(){const o=document.getElementById('dbOverlay'),b=document.getElementById('dbTabBtn');o.classList.toggle('active');b.classList.toggle('active');if(o.classList.contains('active'))switchDBTab('inspections',document.querySelector('.db-tab'));}
+function switchDBTab(tab,el){
+  document.querySelectorAll('.db-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');
+  const ct=document.getElementById('dbContent'),cn=document.getElementById('dbCount');
+  if(tab==='inspections'){
+    if(!db_inspections.length){ct.innerHTML='<div class="db-empty"><div class="db-empty-icon">&#128203;</div><div class="db-empty-text">Registra una inspección en esta sesión demo para verla aquí.</div></div>';cn.textContent='0 registros';return;}
+    ct.innerHTML=`<table class="db-table"><thead><tr><th>ID</th><th>Folio</th><th>BU</th><th>Producto</th><th>No.Op</th><th>Operador</th><th>T</th><th>Lote</th><th>Resultado</th></tr></thead><tbody>
+    ${db_inspections.map(r=>`<tr><td style="font-weight:700">${r.id}</td><td style="font-size:10px">${r.folio}</td><td>${r.bu}</td><td style="font-weight:600">${r.product}</td><td>${r.num_operador}</td><td>${r.operador}</td><td>T${r.turno}</td><td>${r.lote||'N/A'}</td><td><span class="control-status ${r.resultado.toLowerCase()}">${r.resultado==='CONDITIONAL'?'COND.':r.resultado}</span></td></tr>`).join('')}</tbody></table>`;
+    cn.textContent=`${db_inspections.length} registro(s) de esta sesión demo`;
+  } else if(tab==='results'){
+    if(!db_results.length){ct.innerHTML='<div class="db-empty"><div class="db-empty-icon">&#128269;</div><div class="db-empty-text">No hay resultados en esta sesión aún.</div></div>';cn.textContent='0 registros';return;}
+    ct.innerHTML=`<table class="db-table"><thead><tr><th>ID</th><th>Insp.ID</th><th>Control</th><th>Tipo</th><th>Spec</th><th>Valor</th><th>Resultado</th></tr></thead><tbody>
+    ${db_results.map(r=>`<tr><td style="font-weight:700">${r.id}</td><td>${r.inspection_id}</td><td style="font-weight:600">${r.control_name}</td><td>${r.control_type}</td><td style="color:var(--tl-gray-500)">${r.spec}</td><td style="font-weight:600">${r.valor}</td><td><span class="control-status ${r.resultado.toLowerCase()}">${r.resultado}</span></td></tr>`).join('')}</tbody></table>`;
+    cn.textContent=`${db_results.length} registro(s) en esta sesión`;
+  } else if(tab==='products'){
+    ct.innerHTML=`<table class="db-table"><thead><tr><th>ID</th><th>Producto</th><th>P/N</th><th>BU</th></tr></thead><tbody>${DEMO_PRODUCTS.map(p=>`<tr><td style="font-weight:700">${p.id}</td><td style="font-weight:600">${p.name}</td><td>${p.part_number}</td><td>${p.bu_code}</td></tr>`).join('')}</tbody></table>`;
+    cn.textContent=`${DEMO_PRODUCTS.length} productos (demo)`;
+  } else if(tab==='controls'){
+    const all=[];DEMO_PRODUCTS.forEach(p=>{DEMO_CONTROLS[p.id].forEach(ctrl=>all.push({...ctrl,product:p.name}));});
+    ct.innerHTML=`<table class="db-table"><thead><tr><th>Producto</th><th>Control</th><th>Tipo</th><th>Unidad</th><th>LSL</th><th>Target</th><th>USL</th></tr></thead><tbody>${all.map(ctrl=>`<tr><td style="font-weight:600">${ctrl.product}</td><td>${ctrl.name}</td><td>${ctrl.type}</td><td>${ctrl.unit||'—'}</td><td>${ctrl.lsl!=null?ctrl.lsl:'—'}</td><td style="font-weight:600">${ctrl.target!=null?ctrl.target:'—'}</td><td>${ctrl.usl!=null?ctrl.usl:'—'}</td></tr>`).join('')}</tbody></table>`;
+    cn.textContent=`${all.length} controles (demo)`;
+  }
+}
+/* ── DASHBOARD ── */
+function allInspections(){
+  /* Merge demo data with any live data registered this session */
+  return [...demo_inspections,...db_inspections.map(r=>({...r,id:'L'+r.id}))];
+}
+
+let dashFilterBU='all', dashFilterMes='all';
+
+function mesLabel(mmyyyy){
+  const[mm,yyyy]=mmyyyy.split('/');
+  const n=['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  return `${n[parseInt(mm)]} ${yyyy}`;
+}
+
+function setDashFilter(type,val){
+  if(type==='bu') dashFilterBU=val;
+  else dashFilterMes=val;
+  renderDashboard();
+}
+
+function renderDashboard(){
+  const fullAll=allInspections();
+
+  /* ── Build filter chips from full dataset ── */
+  const buList=[...new Set(fullAll.map(r=>r.bu).filter(Boolean))].sort();
+  const mesList=[...new Set(fullAll.map(r=>r.fecha?r.fecha.slice(3):null).filter(Boolean))]
+    .sort((a,b)=>{const[ma,ya]=a.split('/');const[mb,yb]=b.split('/');return (ya*12+parseInt(ma))-(yb*12+parseInt(mb));});
+  document.getElementById('dashBUChips').innerHTML=
+    `<span class="gr-chip${dashFilterBU==='all'?' active':''}" onclick="setDashFilter('bu','all')">Todas</span>`+
+    buList.map(bu=>`<span class="gr-chip${dashFilterBU===bu?' active':''}" onclick="setDashFilter('bu','${bu}')">${bu}</span>`).join('');
+  document.getElementById('dashMesChips').innerHTML=
+    `<span class="gr-chip${dashFilterMes==='all'?' active':''}" onclick="setDashFilter('mes','all')">Todos</span>`+
+    mesList.map(m=>`<span class="gr-chip${dashFilterMes===m?' active':''}" onclick="setDashFilter('mes','${m}')">${mesLabel(m)}</span>`).join('');
+
+  /* ── Apply filters ── */
+  let all=fullAll;
+  if(dashFilterBU!=='all') all=all.filter(r=>r.bu===dashFilterBU);
+  if(dashFilterMes!=='all') all=all.filter(r=>r.fecha&&r.fecha.slice(3)===dashFilterMes);
+  const total=all.length;
+  const activeFilters=[(dashFilterBU!=='all'?dashFilterBU:null),(dashFilterMes!=='all'?mesLabel(dashFilterMes):null)].filter(Boolean);
+  document.getElementById('dashFilterInfo').textContent=
+    total+' registro'+(total!==1?'s':'')+(activeFilters.length?' — '+activeFilters.join(' · '):'');
+
+  const passCount=all.filter(r=>r.resultado==='PASS').length;
+  const condCount=all.filter(r=>r.resultado==='CONDITIONAL').length;
+  const totalFails=all.reduce((s,r)=>s+r.fail_count,0);
+  const passRate=total?Math.round(passCount/total*100):0;
+
+  /* KPIs */
+  document.getElementById('dashKPIs').innerHTML=`
+    <div class="kpi-card kpi-blue animate-in"><div class="kpi-label">Total Inspecciones</div><div class="kpi-value">${total}</div><div class="kpi-sub">registros en sistema</div></div>
+    <div class="kpi-card kpi-green animate-in"><div class="kpi-label">Tasa de Aprobación</div><div class="kpi-value">${passRate}%</div><div class="kpi-sub">${passCount} inspecciones PASS</div></div>
+    <div class="kpi-card kpi-amber animate-in"><div class="kpi-label">Liberaciones Condicionadas</div><div class="kpi-value">${condCount}</div><div class="kpi-sub">${total?Math.round(condCount/total*100):0}% del total</div></div>
+    <div class="kpi-card kpi-red animate-in"><div class="kpi-label">Controles Fallidos</div><div class="kpi-value">${totalFails}</div><div class="kpi-sub">en todas las inspecciones</div></div>`;
+
+  /* Donut — resultado global */
+  const rv=70,cx=85,cy=85,circ=2*Math.PI*rv;
+  const passFrac=total?passCount/total:0;
+  const condFrac=total?condCount/total:0;
+  const passDash=passFrac*circ;
+  const condDash=condFrac*circ;
+  document.getElementById('dashDonut').innerHTML=`
+    <div class="donut-wrap">
+      <svg class="donut-svg" width="170" height="170" viewBox="0 0 170 170">
+        <circle cx="${cx}" cy="${cy}" r="${rv}" fill="none" stroke="var(--tl-gray-100)" stroke-width="22"/>
+        <circle cx="${cx}" cy="${cy}" r="${rv}" fill="none" stroke="var(--tl-green)" stroke-width="22"
+          stroke-dasharray="${passDash} ${circ}" stroke-dashoffset="${circ/4}" stroke-linecap="round" transform="rotate(-90 ${cx} ${cy})"/>
+        <circle cx="${cx}" cy="${cy}" r="${rv}" fill="none" stroke="var(--tl-amber)" stroke-width="22"
+          stroke-dasharray="${condDash} ${circ}" stroke-dashoffset="${-(passDash)+circ/4}" stroke-linecap="round" transform="rotate(-90 ${cx} ${cy})"/>
+        <text x="${cx}" y="${cy-8}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-weight="800" font-size="28" fill="var(--tl-black)">${passRate}%</text>
+        <text x="${cx}" y="${cy+14}" text-anchor="middle" font-family="Barlow,sans-serif" font-size="11" fill="var(--tl-gray-500)">Aprobación</text>
+      </svg>
+      <div class="donut-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--tl-green)"></div><div><div class="legend-label">PASS</div><div class="legend-val">${passCount} insp. (${passRate}%)</div></div></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--tl-amber)"></div><div><div class="legend-label">Condicionado</div><div class="legend-val">${condCount} insp. (${total?Math.round(condCount/total*100):0}%)</div></div></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--tl-gray-300)"></div><div><div class="legend-label">Total</div><div class="legend-val">${total} registros</div></div></div>
+      </div>
+    </div>
+    <p class="dash-note">Los datos de sesión actual se combinan con el demo.</p>`;
+
+  /* Bar — inspecciones por producto */
+  const byProduct={};
+  all.forEach(r=>{if(!byProduct[r.product])byProduct[r.product]=0;byProduct[r.product]++;});
+  const maxProd=Math.max(...Object.values(byProduct),1);
+  document.getElementById('dashByProduct').innerHTML=total?`<div class="bar-chart">${Object.entries(byProduct).sort((a,b)=>b[1]-a[1]).map(([name,cnt])=>`
+    <div class="bar-row">
+      <div class="bar-label" title="${name}">${name}</div>
+      <div class="bar-track"><div class="bar-fill blue" style="width:${Math.round(cnt/maxProd*100)}%"><span class="bar-val">${cnt}</span></div></div>
+      <div class="bar-pct">${Math.round(cnt/total*100)}%</div>
+    </div>`).join('')}</div>`:'<p style="color:var(--tl-gray-500);text-align:center;padding:24px;">Sin datos para los filtros seleccionados</p>';
+
+  /* Bar — tasa de aprobación por turno */
+  const byShift={1:{pass:0,total:0},2:{pass:0,total:0},3:{pass:0,total:0}};
+  all.forEach(r=>{if(byShift[r.turno]){byShift[r.turno].total++;if(r.resultado==='PASS')byShift[r.turno].pass++;}});
+  document.getElementById('dashByShift').innerHTML=`<div class="bar-chart">${[1,2,3].map(t=>{const d=byShift[t],pct=d.total?Math.round(d.pass/d.total*100):0,color=pct>=90?'green':pct>=70?'amber':'red';return`
+    <div class="bar-row">
+      <div class="bar-label">Turno ${t}</div>
+      <div class="bar-track"><div class="bar-fill ${color}" style="width:${pct}%"><span class="bar-val">${d.total?pct+'%':'—'}</span></div></div>
+      <div class="bar-pct">${d.total} insp.</div>
+    </div>`;}).join('')}</div>`;
+
+  /* Bar — controles con más fallas (demo fixed) */
+  const maxFail=demo_failed_controls[0].count;
+  document.getElementById('dashFailedControls').innerHTML=`<div class="bar-chart">${demo_failed_controls.map(c=>`
+    <div class="bar-row">
+      <div class="bar-label" title="${c.name}">${c.name.length>18?c.name.substring(0,17)+'…':c.name}</div>
+      <div class="bar-track"><div class="bar-fill ${c.color}" style="width:${Math.round(c.count/maxFail*100)}%"><span class="bar-val">${c.count}</span></div></div>
+      <div class="bar-pct">${c.count}x</div>
+    </div>`).join('')}</div>`;
+
+  /* Tabla últimas 8 inspecciones */
+  const recent=all.slice(-8).reverse();
+  document.getElementById('dashRecent').innerHTML=recent.length?`
+    <table class="dash-table">
+      <thead><tr><th>ID</th><th>BU</th><th>Fecha</th><th>Producto</th><th>Operador</th><th>Turno</th><th>OK</th><th>Fail</th><th>Resultado</th></tr></thead>
+      <tbody>${recent.map(r=>`<tr>
+        <td style="font-weight:700;font-size:11px">${r.id}</td>
+        <td><span style="font-size:11px;font-weight:700;color:var(--tl-blue)">${r.bu||'—'}</span></td>
+        <td>${r.fecha} ${r.hora}</td>
+        <td style="font-weight:600">${r.product}</td>
+        <td>${r.operador}</td>
+        <td>T${r.turno}</td>
+        <td style="color:var(--tl-green);font-weight:700">${r.pass_count}</td>
+        <td style="color:${r.fail_count?'var(--tl-fail)':'var(--tl-gray-500)'};font-weight:700">${r.fail_count}</td>
+        <td><span class="dash-badge ${r.resultado.toLowerCase()}">${r.resultado==='CONDITIONAL'?'COND.':r.resultado}</span></td>
+      </tr>`).join('')}</tbody>
+    </table>`:'<p style="color:var(--tl-gray-500);text-align:center;padding:24px;">Sin registros para los filtros seleccionados</p>';
+}
+
+/* ── GESTIÓN DE RECLAMOS ── */
+let grFilterBU='all', grFilterStatus='all';
+
+function setGrFilter(type, val){
+  if(type==='bu') grFilterBU=val;
+  else grFilterStatus=val;
+  /* Update chip styles */
+  const groupId=type==='bu'?'grFilterBU':'grFilterStatus';
+  const attr=type==='bu'?'data-bu':'data-st';
+  document.querySelectorAll(`#${groupId} .gr-chip`).forEach(c=>{
+    c.classList.toggle('active', c.getAttribute(attr)===val);
+  });
+  applyGrFilters();
+}
+
+function applyGrFilters(){
+  const alertas=[...demo_alertas,...db_inspections.filter(r=>r.resultado==='CONDITIONAL').map(r=>({
+    id:'LIVE-'+r.id,titulo:'No conformidad — '+r.product,severidad:'mayor',status:'abierta',
+    bu:'CHL',producto:r.product,lote:r.lote,fecha:r.fecha,
+    responsable:r.num_operador+' / '+r.operador,
+    descripcion:'Liberación condicionada registrada en sesión actual. Acción: '+(r.contencion||'N/A'),
+  }))];
+  const conts=[...demo_contenciones,...db_inspections.filter(r=>r.resultado==='CONDITIONAL').map(r=>({
+    id:'LIVE-C'+r.id,folio:r.folio,bu:'CHL',producto:r.product,lote:r.lote,
+    accion:r.contencion||'Sin descripción',responsable:r.num_operador,dias:0,status:'activa',
+  }))];
+
+  /* Map contención status to alerta-style status for the filter */
+  const contStatusMap={activa:'abierta',revision:'investigacion',cerrada:'cerrada'};
+
+  const filtA=alertas.filter(a=>
+    (grFilterBU==='all'||a.bu===grFilterBU) &&
+    (grFilterStatus==='all'||a.status===grFilterStatus)
+  );
+  const filtC=conts.filter(c=>
+    (grFilterBU==='all'||c.bu===grFilterBU) &&
+    (grFilterStatus==='all'||contStatusMap[c.status]===grFilterStatus||c.status===grFilterStatus)
+  );
+
+  const sevLabel={critica:'CRÍTICA',mayor:'MAYOR',menor:'MENOR'};
+  const stLabel={abierta:'Abierta',investigacion:'En Investigación',cerrada:'Cerrada'};
+  const contStLabel={activa:'Activa',revision:'En Revisión',cerrada:'Cerrada'};
+  const contStClass={activa:'abierta',revision:'investigacion',cerrada:'cerrada'};
+
+  /* Results info */
+  document.getElementById('grResultsInfo').textContent=
+    `${filtA.length} alerta${filtA.length!==1?'s':''} · ${filtC.length} contención${filtC.length!==1?'es':''}`;
+
+  /* Alerts */
+  document.getElementById('grAlertBadge').textContent=filtA.length+' resultado'+(filtA.length!==1?'s':'');
+  document.getElementById('grAlertList').innerHTML=filtA.length?filtA.map(a=>`
+    <div class="gr-item">
+      <div class="gr-item-top">
+        <div class="gr-item-title">${a.titulo}</div>
+        <span class="alert-sev ${a.severidad}">${sevLabel[a.severidad]||a.severidad}</span>
+      </div>
+      <div class="gr-item-meta">
+        <span>&#128230; ${a.producto}</span>
+        <span>&#128197; ${a.fecha}</span>
+        <span>&#128101; ${a.responsable}</span>
+        <span class="alert-st ${a.status}">${stLabel[a.status]||a.status}</span>
+      </div>
+      ${a.status!=='cerrada'?`<div class="gr-item-action">${a.descripcion}</div>`:''}
+    </div>`).join('')
+    :'<div class="db-empty" style="padding:32px"><div class="db-empty-text">Sin resultados para los filtros seleccionados</div></div>';
+
+  /* Containments */
+  document.getElementById('grContBadge').textContent=filtC.length+' resultado'+(filtC.length!==1?'s':'');
+  document.getElementById('grContList').innerHTML=filtC.length?filtC.map(c=>`
+    <div class="gr-item clickable" onclick="openContencionReport('${c.id}')">
+      <div class="gr-item-top">
+        <div class="gr-item-title">${c.id} — ${c.producto}</div>
+        <span class="alert-st ${contStClass[c.status]||'abierta'}">${contStLabel[c.status]||c.status}</span>
+      </div>
+      <div class="gr-item-meta">
+        <span>&#128230; Lote: ${c.lote}</span>
+        <span>&#128197; ${c.dias===0?'Hoy':c.dias+' día'+(c.dias!==1?'s':'')}</span>
+        <span>&#128101; ${c.responsable}</span>
+      </div>
+      <div class="gr-item-action">${c.accion}</div>
+      <div class="gr-item-click-hint">&#128065; Ver reporte completo →</div>
+    </div>`).join('')
+    :'<div class="db-empty" style="padding:32px"><div class="db-empty-text">Sin resultados para los filtros seleccionados</div></div>';
+}
+
+function renderGestion(){
+  const alertas=[...demo_alertas,...db_inspections.filter(r=>r.resultado==='CONDITIONAL').map(r=>({
+    id:'LIVE-'+r.id,titulo:'No conformidad — '+r.product,severidad:'mayor',status:'abierta',
+    bu:'CHL',producto:r.product,lote:r.lote,fecha:r.fecha,
+    responsable:r.num_operador+' / '+r.operador,
+    descripcion:'Liberación condicionada registrada en sesión actual. Acción: '+(r.contencion||'N/A'),
+  }))];
+  const conts=[...demo_contenciones,...db_inspections.filter(r=>r.resultado==='CONDITIONAL').map(r=>({
+    id:'LIVE-C'+r.id,folio:r.folio,bu:'CHL',producto:r.product,lote:r.lote,
+    accion:r.contencion||'Sin descripción',responsable:r.num_operador,dias:0,status:'activa',
+  }))];
+
+  /* Reset filters on module open */
+  grFilterBU='all'; grFilterStatus='all';
+  document.querySelectorAll('#grFilterBU .gr-chip').forEach(c=>c.classList.toggle('active',c.getAttribute('data-bu')==='all'));
+  document.querySelectorAll('#grFilterStatus .gr-chip').forEach(c=>c.classList.toggle('active',c.getAttribute('data-st')==='all'));
+
+  const abiertas=alertas.filter(a=>a.status==='abierta').length;
+  const investig=alertas.filter(a=>a.status==='investigacion').length;
+  const contActivas=conts.filter(c=>c.status==='activa'||c.status==='revision').length;
+  const cerradas=alertas.filter(a=>a.status==='cerrada').length+conts.filter(c=>c.status==='cerrada').length;
+
+  document.getElementById('grKPIs').innerHTML=`
+    <div class="kpi-card kpi-red animate-in"><div class="kpi-label">Alertas Abiertas</div><div class="kpi-value">${abiertas}</div><div class="kpi-sub">requieren acción inmediata</div></div>
+    <div class="kpi-card kpi-amber animate-in"><div class="kpi-label">En Investigación</div><div class="kpi-value">${investig}</div><div class="kpi-sub">análisis en proceso</div></div>
+    <div class="kpi-card kpi-blue animate-in"><div class="kpi-label">Contenciones Activas</div><div class="kpi-value">${contActivas}</div><div class="kpi-sub">lotes en cuarentena / revisión</div></div>
+    <div class="kpi-card kpi-green animate-in"><div class="kpi-label">Cerradas</div><div class="kpi-value">${cerradas}</div><div class="kpi-sub">resueltas</div></div>`;
+
+  applyGrFilters();
+}
+
+/* ── REPORTE DE CONTENCIÓN ── */
+function openContencionReport(id){
+  const allConts=[...demo_contenciones,...db_inspections.filter(r=>r.resultado==='CONDITIONAL').map(r=>({
+    id:'LIVE-C'+r.id,folio:r.folio,status:'activa',dias:0,
+    fecha_apertura:r.fecha,hora_apertura:r.hora,fecha_objetivo:'—',fecha_cierre:null,
+    numero_parte:r.pn,producto:r.product,cliente:'Truck-Lite OEM',planta:'CHL — Chihuahua',linea:'—',turno:r.turno,
+    lote:r.lote,cantidad_producida:'—',cantidad_inspeccionada:r.pass_count+r.fail_count,
+    cantidad_ok:r.pass_count,cantidad_nok:r.fail_count,
+    tipo_defecto:'No Conformidad',defecto:'Liberación condicionada — ver detalle de inspección',
+    causa_raiz:'Pendiente de análisis.',
+    accion:r.contencion||'Sin descripción',accion_correctiva:'Por definir.',
+    inspector:r.operador,num_inspector:r.num_operador,responsable:r.num_operador,auditor:'—',
+    comentarios:'Generado automáticamente desde Liberación de Primera Pieza.',
+    d8:[
+      {d:'D1',titulo:'Equipo de Respuesta',desc:'Por asignar.',done:false},
+      {d:'D2',titulo:'Descripción del Problema',desc:r.contencion||'—',done:true},
+      {d:'D3',titulo:'Acción de Contención',desc:r.contencion||'—',done:true},
+      {d:'D4',titulo:'Causa Raíz',desc:'Pendiente.',done:false},
+      {d:'D5',titulo:'Acción Correctiva',desc:'—',done:false},
+      {d:'D6',titulo:'Implementación',desc:'—',done:false},
+      {d:'D7',titulo:'Verificación',desc:'—',done:false},
+      {d:'D8',titulo:'Cierre y Reconocimiento',desc:'—',done:false},
+    ],
+    columnas:null,specs:null,muestras:null,
+  }))];
+  const c=allConts.find(x=>x.id===id);
+  if(!c)return;
+
+  const stLabel={activa:'Activa',revision:'En Revisión',cerrada:'Cerrada'};
+  const stClass={activa:'abierta',revision:'investigacion',cerrada:'cerrada'};
+  const nok=Number(c.cantidad_nok)||0,ok=Number(c.cantidad_ok)||0,insp=Number(c.cantidad_inspeccionada)||0,prod=c.cantidad_producida;
+  const pct=insp?Math.round(nok/insp*100):0;
+
+  const colsHtml=c.columnas?c.columnas.map(col=>`<th>${col}</th>`).join(''):'';
+  const rowsHtml=c.muestras?c.muestras.map((m,mi)=>{
+    const rowClass=m.resultado==='NOK'?'rpt-row-nok':'rpt-row-ok';
+    const cellsHtml=m.vals.map((v,vi)=>{
+      const spec=c.specs&&c.specs[vi];
+      if(spec){
+        const num=parseFloat(v);
+        const fail=!isNaN(num)&&(num<spec.lsl||num>spec.usl);
+        return`<td class="${fail?'rpt-cell-nok':''}">${v}</td>`;
+      }
+      return`<td class="${v==='FAIL'?'rpt-cell-nok':v==='PASS'?'rpt-cell-ok':''}">${v}</td>`;
+    }).join('');
+    return`<tr class="${rowClass}"><td>Pieza ${m.pieza}</td>${cellsHtml}<td class="${m.resultado==='NOK'?'rpt-cell-nok':'rpt-cell-ok'}">${m.resultado}</td></tr>`;
+  }).join(''):'<tr><td colspan="20" style="text-align:center;padding:20px;color:var(--tl-gray-500)">Sin muestra de unidades registrada</td></tr>';
+
+  document.getElementById('rptPanel').innerHTML=`
+    <div class="rpt-topbar">
+      <div class="rpt-topbar-left">
+        <div><div class="rpt-id">Reporte de Contención — ${c.id}</div><div class="rpt-folio">Folio LPF: ${c.folio}</div></div>
+        <span class="alert-st ${stClass[c.status]||'abierta'}" style="font-size:12px">${stLabel[c.status]||c.status}</span>
+      </div>
+      <button class="rpt-close" onclick="closeContencionReport()">×</button>
+    </div>
+    <div class="rpt-body">
+
+      <!-- 1. Info del Parte -->
+      <div class="rpt-section">
+        <div class="rpt-section-title">1. Información del Parte</div>
+        <div class="rpt-grid-4">
+          <div class="rpt-field"><div class="rpt-label">Número de Parte</div><div class="rpt-value">${c.numero_parte}</div></div>
+          <div class="rpt-field"><div class="rpt-label">Descripción</div><div class="rpt-value">${c.producto}</div></div>
+          <div class="rpt-field"><div class="rpt-label">Cliente</div><div class="rpt-value">${c.cliente}</div></div>
+          <div class="rpt-field"><div class="rpt-label">Planta / BU</div><div class="rpt-value">${c.planta}</div></div>
+          <div class="rpt-field"><div class="rpt-label">Línea de Producción</div><div class="rpt-value">${c.linea}</div></div>
+          <div class="rpt-field"><div class="rpt-label">Turno</div><div class="rpt-value">Turno ${c.turno}</div></div>
+          <div class="rpt-field"><div class="rpt-label">Número de Lote</div><div class="rpt-value">${c.lote}</div></div>
+          <div class="rpt-field"><div class="rpt-label">Fecha de Apertura</div><div class="rpt-value">${c.fecha_apertura} ${c.hora_apertura}</div></div>
+        </div>
+      </div>
+
+      <!-- 2. Defecto -->
+      <div class="rpt-section">
+        <div class="rpt-section-title">2. Identificación del Defecto</div>
+        <div class="rpt-grid-3" style="margin-bottom:12px">
+          <div class="rpt-field"><div class="rpt-label">Tipo de Defecto</div><div class="rpt-value">${c.tipo_defecto}</div></div>
+          <div class="rpt-field"><div class="rpt-label">Fecha Objetivo de Cierre</div><div class="rpt-value">${c.fecha_objetivo}</div></div>
+          <div class="rpt-field"><div class="rpt-label">Fecha de Cierre</div><div class="rpt-value">${c.fecha_cierre||'Abierto'}</div></div>
+        </div>
+        <div class="rpt-field"><div class="rpt-label">Descripción del Defecto</div><div class="rpt-value" style="font-size:14px;padding:10px 14px;background:var(--tl-fail-light);border-radius:8px;color:var(--tl-fail)">${c.defecto}</div></div>
+      </div>
+
+      <!-- 3. Resumen de Inspección -->
+      <div class="rpt-section">
+        <div class="rpt-section-title">3. Resumen de Inspección del Lote</div>
+        <div class="rpt-summary-row">
+          <div class="rpt-sum-box"><div class="rpt-sum-val" style="color:var(--tl-blue)">${prod}</div><div class="rpt-sum-lbl">Piezas Producidas</div></div>
+          <div class="rpt-sum-box"><div class="rpt-sum-val" style="color:var(--tl-black)">${insp}</div><div class="rpt-sum-lbl">Inspeccionadas</div></div>
+          <div class="rpt-sum-box ok"><div class="rpt-sum-val">${ok}</div><div class="rpt-sum-lbl">Conformes (OK)</div></div>
+          <div class="rpt-sum-box nok"><div class="rpt-sum-val">${nok}</div><div class="rpt-sum-lbl">No Conformes (NOK)</div></div>
+          <div class="rpt-sum-box ${pct>0?'nok':'ok'}"><div class="rpt-sum-val">${pct}%</div><div class="rpt-sum-lbl">% NOK</div></div>
+        </div>
+      </div>
+
+      <!-- 4. Resultados de Muestra -->
+      <div class="rpt-section">
+        <div class="rpt-section-title">4. Resultados de Muestra por Pieza</div>
+        <div style="overflow-x:auto">
+          <table class="rpt-table">
+            <thead><tr><th>Pieza</th>${colsHtml}<th>Resultado</th></tr></thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+        </div>
+        <p style="font-size:11px;color:var(--tl-gray-500);margin-top:8px">Valores en rojo indican fuera de especificación.</p>
+      </div>
+
+      <!-- 5. Acción de Contención -->
+      <div class="rpt-section">
+        <div class="rpt-section-title">5. Acción de Contención Inmediata</div>
+        <div style="padding:14px 18px;background:var(--tl-amber-light);border-left:4px solid var(--tl-amber);border-radius:8px;font-size:14px;margin-bottom:12px">${c.accion}</div>
+        <div class="rpt-grid-2">
+          <div class="rpt-field"><div class="rpt-label">Causa Raíz Identificada</div><div class="rpt-value" style="font-size:13px;font-weight:500">${c.causa_raiz}</div></div>
+          <div class="rpt-field"><div class="rpt-label">Acción Correctiva</div><div class="rpt-value" style="font-size:13px;font-weight:500">${c.accion_correctiva}</div></div>
+        </div>
+      </div>
+
+      <!-- 6. 8D -->
+      <div class="rpt-section">
+        <div class="rpt-section-title">6. Progreso 8D — Proceso de Solución de Problemas</div>
+        <div class="d8-grid">${c.d8.map(s=>`
+          <div class="d8-step ${s.done?'done':'pending'}">
+            <div class="d8-label">${s.d} ${s.done?'✓':''}</div>
+            <div class="d8-title">${s.titulo}</div>
+            <div class="d8-desc">${s.desc}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- 7. Comentarios -->
+      ${c.comentarios?`<div class="rpt-section"><div class="rpt-section-title">7. Comentarios Adicionales</div><div style="padding:12px 16px;background:var(--tl-gray-100);border-radius:8px;font-size:13px">${c.comentarios}</div></div>`:''}
+
+    </div>
+    <div class="rpt-footer">
+      <div class="rpt-sign-row">
+        <div class="rpt-sign"><div class="rpt-sign-line"></div><div class="rpt-sign-name">${c.inspector}</div><div class="rpt-sign-role">Inspector — ${c.num_inspector}</div></div>
+        <div class="rpt-sign"><div class="rpt-sign-line"></div><div class="rpt-sign-name">${c.responsable}</div><div class="rpt-sign-role">Responsable QA</div></div>
+        <div class="rpt-sign"><div class="rpt-sign-line"></div><div class="rpt-sign-name">${c.auditor}</div><div class="rpt-sign-role">Auditor de Calidad</div></div>
+      </div>
+      <div style="font-size:11px;color:var(--tl-gray-500);text-align:right">Generado: ${new Date().toLocaleDateString('es-MX')} ${new Date().toLocaleTimeString('es-MX')}<br>Truck-Lite QC Kiosk — ${c.folio}</div>
+    </div>`;
+  document.getElementById('rptOverlay').classList.add('active');
+}
+function closeContencionReport(){document.getElementById('rptOverlay').classList.remove('active');}
+
+/* ── 8D MODULE ── */
+function renderEightD(){
+  const stLabel={open:'Abierto',progress:'En Progreso',verify:'En Verificación',closed:'Cerrado'};
+  const stClass={open:'open',progress:'progress',verify:'verify',closed:'closed'};
+
+  const total=demo_8ds.length;
+  const open=demo_8ds.filter(d=>d.status==='open').length;
+  const progress=demo_8ds.filter(d=>d.status==='progress').length;
+  const verify=demo_8ds.filter(d=>d.status==='verify').length;
+  const closed=demo_8ds.filter(d=>d.status==='closed').length;
+
+  /* Update panel badge */
+  const pb=document.getElementById('panel8dCount');
+  if(pb)pb.textContent=(open+progress)+' abiertos';
+
+  document.getElementById('edKPIs').innerHTML=`
+    <div class="kpi-card kpi-blue animate-in"><div class="kpi-label">Total 8Ds</div><div class="kpi-value">${total}</div><div class="kpi-sub">reportes registrados</div></div>
+    <div class="kpi-card kpi-red animate-in"><div class="kpi-label">Abiertos</div><div class="kpi-value">${open}</div><div class="kpi-sub">requieren acción</div></div>
+    <div class="kpi-card kpi-amber animate-in"><div class="kpi-label">En Progreso</div><div class="kpi-value">${progress}</div><div class="kpi-sub">D4–D6 activos</div></div>
+    <div class="kpi-card" style="border-left-color:var(--tl-blue);border-left:4px solid var(--tl-blue)" class="animate-in"><div class="kpi-label">En Verificación</div><div class="kpi-value" style="color:var(--tl-blue)">${verify}</div><div class="kpi-sub">D7 activo</div></div>
+    <div class="kpi-card kpi-green animate-in"><div class="kpi-label">Cerrados</div><div class="kpi-value">${closed}</div><div class="kpi-sub">resueltos</div></div>`;
+
+  document.getElementById('edList').innerHTML=demo_8ds.map(r=>{
+    const doneCount=r.d.filter(s=>s.status==='done').length;
+    const pct=Math.round(doneCount/8*100);
+    const activeStep=r.d.find(s=>s.status==='active');
+    return`<div class="eightd-card ${stClass[r.status]} animate-in">
+      <div class="eightd-header" onclick="toggle8D('${r.id}')">
+        <div class="eightd-title-block">
+          <div class="eightd-id">${r.id} &nbsp;·&nbsp; ${r.parte}</div>
+          <div class="eightd-title">${r.titulo}</div>
+          <div class="eightd-meta">
+            <span>&#128230; ${r.producto}</span>
+            <span>&#128197; Apertura: ${r.fecha_apertura}</span>
+            <span>&#127919; Objetivo: ${r.fecha_objetivo}</span>
+            ${r.fecha_cierre?`<span>&#9989; Cerrado: ${r.fecha_cierre}</span>`:''}
+            <span>&#128101; ${r.responsable}</span>
+            ${activeStep?`<span style="color:var(--tl-amber);font-weight:700">&#9654; Activo: ${activeStep.n} ${activeStep.titulo}</span>`:''}
+          </div>
+        </div>
+        <div class="eightd-badges">
+          <span style="font-size:12px;color:var(--tl-gray-500);font-weight:600">${pct}%</span>
+          <span class="eightd-st ${stClass[r.status]}">${stLabel[r.status]}</span>
+          <span class="eightd-chevron" id="chev_${r.id}">&#9654;</span>
+        </div>
+      </div>
+      <div class="eightd-body" id="body_${r.id}">
+        <div class="eightd-progress-wrap">
+          <div class="eightd-progress-label"><span>Progreso 8D</span><span>${doneCount}/8 disciplinas completadas</span></div>
+          <div class="eightd-progress-track"><div class="eightd-progress-fill" style="width:${pct}%"></div></div>
+        </div>
+        <div class="eightd-steps">${r.d.map(s=>`
+          <div class="eightd-step ${s.status==='done'?'done':s.status==='active'?'active-step':'pending'}">
+            <div class="eightd-step-label">${s.n} ${s.status==='done'?'✓':s.status==='active'?'▶':''}</div>
+            <div class="eightd-step-title">${s.titulo}</div>
+            <div class="eightd-step-desc">${s.desc}</div>
+            ${s.status!=='pending'?`<div style="font-size:10px;color:var(--tl-gray-500);margin-top:4px">&#128101; ${s.resp} &nbsp;·&nbsp; &#128197; ${s.fecha}</div>`:''}
+          </div>`).join('')}
+        </div>
+        <div class="eightd-detail-grid">
+          <div class="eightd-field"><div class="eightd-field-label">Lote</div><div class="eightd-field-value">${r.lote}</div></div>
+          <div class="eightd-field"><div class="eightd-field-label">Cliente</div><div class="eightd-field-value">${r.cliente}</div></div>
+          <div class="eightd-field"><div class="eightd-field-label">Equipo</div><div class="eightd-field-value">${r.equipo.join(', ')}</div></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggle8D(id){
+  const body=document.getElementById('body_'+id);
+  const chev=document.getElementById('chev_'+id);
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  chev.classList.toggle('open',!isOpen);
+}
+
+/* ── 5S MODULE ── */
+const demo_5s=[
+  {
+    id:'5S-2025-041',folio:'5S-2025-041',linea:'L-01 Truck-Lite 920',auditor:'Carlos Medina',fecha:'2025-04-10',turno:'1er Turno',
+    scores:{seiri:9,seiton:8,seiso:9,seiketsu:8,shitsuke:9},total:43,max:50,
+    status:'aprobada',
+    observaciones:'Área en excelentes condiciones. Materiales correctamente identificados y almacenados. Sin materiales obsoletos en estación.',
+    acciones:[
+      {texto:'Reemplazar etiqueta dañada en rack A3',resp:'M. López',status:'done'},
+      {texto:'Actualizar tabla de control visual en prensa',resp:'C. Medina',status:'done'}
+    ]
+  },
+  {
+    id:'5S-2025-040',folio:'5S-2025-040',linea:'L-02 Truck-Lite 120',auditor:'Ana Torres',fecha:'2025-04-09',turno:'2do Turno',
+    scores:{seiri:7,seiton:6,seiso:7,seiketsu:6,shitsuke:7},total:33,max:50,
+    status:'observaciones',
+    observaciones:'Se encontraron herramientas sin identificar en la estación 3. Área de scrap sin señalización adecuada. Piso con manchas de aceite cerca de prensa hidráulica.',
+    acciones:[
+      {texto:'Identificar y colocar en posición correcta herramientas Estación 3',resp:'A. Torres',status:'open'},
+      {texto:'Señalizar área de scrap con cinta delimitadora',resp:'Supervisor L-02',status:'open'},
+      {texto:'Limpiar y revisar fuga de aceite prensa hidráulica',resp:'Mtto. Preventivo',status:'open'}
+    ]
+  },
+  {
+    id:'5S-2025-039',folio:'5S-2025-039',linea:'L-03 Truck-Lite 800',auditor:'Jorge Reyes',fecha:'2025-04-08',turno:'1er Turno',
+    scores:{seiri:5,seiton:4,seiso:5,seiketsu:4,shitsuke:4},total:22,max:50,
+    status:'reprobada',
+    observaciones:'Área presenta acumulación de materiales sin clasificar desde semana pasada. Pasillos parcialmente obstruidos. Iluminación insuficiente en zona de ensamble. Requiere acción correctiva inmediata.',
+    acciones:[
+      {texto:'Clasificar y retirar materiales sin uso de área de ensamble',resp:'Supervisor L-03',status:'open'},
+      {texto:'Liberar pasillos — retiro de rack temporal',resp:'Almacén',status:'open'},
+      {texto:'Gestionar cambio de luminarias fundidas (3 pzas)',resp:'Mtto. Eléctrico',status:'open'},
+      {texto:'Re-auditar en 5 días hábiles',resp:'Calidad',status:'open'}
+    ]
+  },
+  {
+    id:'5S-2025-038',folio:'5S-2025-038',linea:'L-01 Truck-Lite 920',auditor:'Laura Soto',fecha:'2025-04-04',turno:'1er Turno',
+    scores:{seiri:8,seiton:9,seiso:8,seiketsu:9,shitsuke:8},total:42,max:50,
+    status:'aprobada',
+    observaciones:'Línea en óptimas condiciones. Control visual actualizado. Sin observaciones mayores.',
+    acciones:[
+      {texto:'Laminar nuevos estándares visuales impresos',resp:'L. Soto',status:'done'}
+    ]
+  },
+  {
+    id:'5S-2025-037',folio:'5S-2025-037',linea:'L-04 Ensamble Final',auditor:'Pedro Vázquez',fecha:'2025-04-02',turno:'3er Turno',
+    scores:{seiri:6,seiton:7,seiso:6,seiketsu:7,shitsuke:6},total:32,max:50,
+    status:'observaciones',
+    observaciones:'Cajas de rechazo sin identificar en estación de inspección visual. Cartón acumulado junto a salida de emergencia. Requiere atención en turno siguiente.',
+    acciones:[
+      {texto:'Etiquetar cajas de rechazo con folio y fecha',resp:'P. Vázquez',status:'done'},
+      {texto:'Retirar cartón de salida de emergencia',resp:'Operador turno 1',status:'open'}
+    ]
+  }
+];
+
+let fsFilterLinea='all';
+let fsFilterSt='all';
+let fsSelectedId=null;
+
+function scoreClass(s,max){
+  const pct=s/max;
+  if(pct>=0.8)return'high';
+  if(pct>=0.6)return'mid';
+  return'low';
+}
+
+function renderFiveS(){
+  fsFilterLinea='all';fsFilterSt='all';fsSelectedId=null;
+  document.getElementById('fsDetailWrap').innerHTML='';
+  // reset chips
+  document.querySelectorAll('[data-fs-st]').forEach(c=>{c.classList.toggle('active',c.dataset.fsSt==='all');});
+
+  // KPIs
+  const total=demo_5s.length;
+  const aprobadas=demo_5s.filter(a=>a.status==='aprobada').length;
+  const conObs=demo_5s.filter(a=>a.status==='observaciones').length;
+  const reprobadas=demo_5s.filter(a=>a.status==='reprobada').length;
+  const avgScore=Math.round(demo_5s.reduce((s,a)=>s+a.total,0)/demo_5s.length);
+  const avgPct=Math.round(avgScore/50*100);
+  document.getElementById('fsKPIs').innerHTML=`
+    <div class="kpi-card kpi-blue"><div class="kpi-label">Total Auditorías</div><div class="kpi-value">${total}</div><div class="kpi-sub">Este mes</div></div>
+    <div class="kpi-card kpi-green"><div class="kpi-label">Aprobadas</div><div class="kpi-value">${aprobadas}</div><div class="kpi-sub">${Math.round(aprobadas/total*100)}% del total</div></div>
+    <div class="kpi-card kpi-amber"><div class="kpi-label">Con Observaciones</div><div class="kpi-value">${conObs}</div><div class="kpi-sub">Requieren seguimiento</div></div>
+    <div class="kpi-card ${reprobadas>0?'kpi-red':'kpi-green'}"><div class="kpi-label">Reprobadas</div><div class="kpi-value">${reprobadas}</div><div class="kpi-sub">Acción inmediata</div></div>
+  `;
+
+  // Line filter chips
+  const lineas=[...new Set(demo_5s.map(a=>a.linea))];
+  document.getElementById('fsLineas').innerHTML=
+    `<span class="fs-chip active" data-fs-ln="all" onclick="setFsFilter('ln','all',this)">Todas</span>`+
+    lineas.map(l=>`<span class="fs-chip" data-fs-ln="${l}" onclick="setFsFilter('ln','${l}',this)">${l.split(' ').slice(0,2).join(' ')}</span>`).join('');
+
+  applyFsFilters();
+}
+
+function setFsFilter(type,val,el){
+  if(type==='ln'){
+    fsFilterLinea=val;
+    document.querySelectorAll('[data-fs-ln]').forEach(c=>c.classList.toggle('active',c.dataset.fsLn===val));
+  } else {
+    fsFilterSt=val;
+    document.querySelectorAll('[data-fs-st]').forEach(c=>c.classList.toggle('active',c.dataset.fsSt===val));
+  }
+  applyFsFilters();
+}
+
+function applyFsFilters(){
+  let list=demo_5s;
+  if(fsFilterLinea!=='all') list=list.filter(a=>a.linea===fsFilterLinea);
+  if(fsFilterSt!=='all') list=list.filter(a=>a.status===fsFilterSt);
+  document.getElementById('fsResultsInfo').textContent=`${list.length} registro${list.length!==1?'s':''} encontrado${list.length!==1?'s':''}`;
+  const tbody=document.getElementById('fsTableBody');
+  if(!list.length){tbody.innerHTML=`<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--tl-gray-500);font-style:italic;">Sin registros para los filtros seleccionados</td></tr>`;return;}
+  tbody.innerHTML=list.map(a=>{
+    const sc=scoreClass(a.total,a.max);
+    const stHtml=`<span class="fs-st ${a.status}">${a.status==='observaciones'?'Observaciones':a.status.charAt(0).toUpperCase()+a.status.slice(1)}</span>`;
+    return`<tr onclick="openFsDetail('${a.id}')" title="Ver detalle">
+      <td style="font-weight:700;font-family:'Barlow Condensed',sans-serif;">${a.folio}</td>
+      <td>${a.linea}</td>
+      <td>${a.auditor}</td>
+      <td>${a.fecha}</td>
+      <td class="fs-score ${scoreClass(a.scores.seiri,10)}">${a.scores.seiri}/10</td>
+      <td class="fs-score ${scoreClass(a.scores.seiton,10)}">${a.scores.seiton}/10</td>
+      <td class="fs-score ${scoreClass(a.scores.seiso,10)}">${a.scores.seiso}/10</td>
+      <td class="fs-score ${scoreClass(a.scores.seiketsu,10)}">${a.scores.seiketsu}/10</td>
+      <td class="fs-score ${scoreClass(a.scores.shitsuke,10)}">${a.scores.shitsuke}/10</td>
+      <td class="fs-score ${sc}" style="font-size:17px;">${a.total}/${a.max}</td>
+      <td>${stHtml}</td>
+    </tr>`;
+  }).join('');
+}
+
+function openFsDetail(id){
+  const a=demo_5s.find(x=>x.id===id);
+  if(!a)return;
+  fsSelectedId=id;
+  const sNames={seiri:'Seiri',seiton:'Seiton',seiso:'Seiso',seiketsu:'Seiketsu',shitsuke:'Shitsuke'};
+  const sDescs={seiri:'Clasificar',seiton:'Ordenar',seiso:'Limpiar',seiketsu:'Estandarizar',shitsuke:'Disciplinar'};
+  const sc=scoreClass(a.total,a.max);
+  const stHtml=`<span class="fs-st ${a.status}" style="font-size:13px;">${a.status==='observaciones'?'Con Observaciones':a.status.charAt(0).toUpperCase()+a.status.slice(1)}</span>`;
+  const sCards=Object.entries(a.scores).map(([k,v])=>`
+    <div class="fs-s-card ${scoreClass(v,10)}">
+      <div class="fs-s-name">${sNames[k]}</div>
+      <div class="fs-s-title">${sDescs[k]}</div>
+      <div class="fs-s-score">${v}</div>
+      <div class="fs-s-max">/ 10</div>
+    </div>`).join('');
+  const accionesHtml=a.acciones.map(ac=>`
+    <div class="fs-action-item ${ac.status}">
+      <span class="fs-action-icon">${ac.status==='done'?'✅':'⚠️'}</span>
+      <span class="fs-action-text">${ac.texto}</span>
+      <span class="fs-action-resp">Resp: ${ac.resp}</span>
+    </div>`).join('');
+  const pct=Math.round(a.total/a.max*100);
+  document.getElementById('fsDetailWrap').innerHTML=`
+    <div class="fs-detail animate-in">
+      <div class="fs-detail-header">
+        <div>
+          <div class="fs-detail-id">&#128196; ${a.folio} ${stHtml}</div>
+          <div class="fs-detail-meta">${a.linea} &nbsp;|&nbsp; ${a.fecha} &nbsp;|&nbsp; ${a.turno} &nbsp;|&nbsp; Auditor: ${a.auditor}</div>
+        </div>
+        <button class="fs-detail-close" onclick="closeFsDetail()">×</button>
+      </div>
+      <div class="fs-detail-body">
+        <div style="margin-bottom:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span style="font-size:13px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:1px;">Calificación Total</span>
+            <span class="fs-score ${sc}" style="font-size:22px;">${a.total} / ${a.max} &nbsp; (${pct}%)</span>
+          </div>
+          <div style="background:var(--tl-gray-100);border-radius:6px;height:14px;overflow:hidden;">
+            <div style="height:100%;border-radius:6px;width:${pct}%;background:${sc==='high'?'var(--tl-green)':sc==='mid'?'var(--tl-amber)':'var(--tl-fail)'};transition:width 0.7s;"></div>
+          </div>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Puntuación por S</div>
+        <div class="fs-s-grid">${sCards}</div>
+        <div style="font-size:11px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Observaciones</div>
+        <div class="fs-obs-box"><div class="fs-obs-text">${a.observaciones}</div></div>
+        <div style="font-size:11px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Acciones Correctivas (${a.acciones.length})</div>
+        <div class="fs-action-list">${accionesHtml}</div>
+      </div>
+    </div>`;
+  document.getElementById('fsDetailWrap').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function closeFsDetail(){
+  fsSelectedId=null;
+  document.getElementById('fsDetailWrap').innerHTML='';
+}
+</script>
+</body>
+</html>
