@@ -415,7 +415,78 @@
   .dash-note{font-size:12px;color:var(--tl-gray-500);margin-top:12px;text-align:center;}
 
   /* ── 5S MODULE ── */
-  .fs-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+  /* ── 5S SCHEDULE ── */
+  .fs-kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:20px;}
+  .fs-sched-wrap{background:var(--tl-white);border-radius:var(--radius);box-shadow:var(--shadow-sm);margin-bottom:20px;overflow:hidden;}
+  .fs-sched-hdr{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--tl-gray-100);flex-wrap:wrap;gap:12px;}
+  .fs-sched-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:1px;}
+  .fs-sched-body{padding:18px 20px;}
+  .fs-sched-body.collapsed{display:none;}
+  .btn-new-audit{background:var(--tl-orange);color:var(--tl-white);border:none;padding:8px 18px;border-radius:8px;font-family:'Barlow',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all 0.2s;}
+  .btn-new-audit:hover{filter:brightness(0.88);transform:translateY(-1px);}
+  .btn-collapse{background:none;border:1px solid var(--tl-gray-300);padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:var(--tl-gray-700);}
+  /* Week view */
+  .fs-week-nav{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+  .fs-week-label{font-weight:700;font-size:14px;flex:1;text-align:center;}
+  .fs-week-arrow{background:none;border:1px solid var(--tl-gray-300);width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+  .fs-sched-chip{display:block;padding:4px 7px;border-radius:5px;font-size:11px;font-weight:700;margin-bottom:3px;cursor:pointer;transition:opacity 0.2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:3px solid transparent;}
+  .fs-sched-chip:hover{opacity:0.75;}
+  .fs-sched-chip.completada{background:var(--tl-green-light);color:var(--tl-green);border-left-color:var(--tl-green);}
+  .fs-sched-chip.pendiente{background:var(--tl-blue-light);color:var(--tl-blue);border-left-color:var(--tl-blue);}
+  .fs-sched-chip.retrasada{background:var(--tl-fail-light);color:var(--tl-fail);border-left-color:var(--tl-fail);}
+  .fs-sched-chip.programada{background:var(--tl-gray-100);color:var(--tl-gray-700);border-left-color:var(--tl-gray-300);}
+  .fs-week-legend{display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;}
+  .fs-week-legend span{font-size:11px;color:var(--tl-gray-500);}
+  /* Kanban */
+  .fs-kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .fs-kb-col{background:var(--tl-gray-100);border-radius:10px;padding:12px;}
+  .fs-kb-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:6px 10px;border-radius:6px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+  .fs-kb-title.pendiente{background:var(--tl-blue-light);color:var(--tl-blue);}
+  .fs-kb-title.retrasada{background:var(--tl-fail-light);color:var(--tl-fail);}
+  .fs-kb-title.completada{background:var(--tl-green-light);color:var(--tl-green);}
+  .fs-kb-title.programada{background:var(--tl-gray-100);color:var(--tl-gray-700);border:1px solid var(--tl-gray-300);}
+  .fs-kb-card{background:var(--tl-white);border-radius:8px;padding:12px;margin-bottom:8px;box-shadow:var(--shadow-sm);cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;}
+  .fs-kb-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
+  .fs-kb-card-id{font-size:10px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+  .fs-kb-card-line{font-weight:700;font-size:13px;margin-bottom:4px;}
+  .fs-kb-card-meta{font-size:11px;color:var(--tl-gray-500);display:flex;gap:8px;flex-wrap:wrap;}
+  .fs-kb-empty{text-align:center;padding:20px 8px;color:var(--tl-gray-500);font-size:12px;font-style:italic;}
+  @media(max-width:768px){.fs-kanban{grid-template-columns:1fr 1fr}}
+  /* ── AUDIT FORM MODAL ── */
+  .audit-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:400;justify-content:center;align-items:flex-start;padding:20px 16px;overflow-y:auto;}
+  .audit-overlay.active{display:flex;}
+  .audit-modal{background:var(--tl-white);border-radius:16px;width:100%;max-width:700px;overflow:hidden;animation:fadeInUp 0.3s ease;box-shadow:var(--shadow-xl);}
+  .audit-mhead{background:var(--tl-black);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .audit-mhead-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:19px;color:var(--tl-white);text-transform:uppercase;letter-spacing:1px;}
+  .audit-mhead-sub{font-size:12px;color:var(--tl-gray-500);margin-top:2px;}
+  .audit-close{background:none;border:none;color:var(--tl-gray-500);font-size:28px;cursor:pointer;line-height:1;}
+  .audit-close:hover{color:var(--tl-white);}
+  .audit-s-progress{display:flex;border-bottom:2px solid var(--tl-gray-100);}
+  .audit-s-tab{flex:1;padding:11px 6px;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;cursor:pointer;border-bottom:3px solid transparent;color:var(--tl-gray-500);transition:all 0.2s;}
+  .audit-s-tab.done{color:var(--tl-green);border-bottom-color:var(--tl-green);}
+  .audit-s-tab.active{color:var(--tl-orange);border-bottom-color:var(--tl-orange);background:var(--tl-orange-light);}
+  .audit-s-tab.pending{color:var(--tl-gray-300);}
+  .audit-body{padding:22px 24px;}
+  .audit-s-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;text-transform:uppercase;margin-bottom:3px;}
+  .audit-s-desc{font-size:13px;color:var(--tl-gray-500);margin-bottom:18px;}
+  .audit-partial{display:flex;justify-content:space-between;align-items:center;background:var(--tl-gray-100);border-radius:8px;padding:8px 14px;margin-bottom:16px;}
+  .audit-q-list{display:flex;flex-direction:column;gap:10px;}
+  .audit-q{background:var(--tl-gray-100);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px;}
+  .audit-q-text{flex:1;font-size:13px;font-weight:500;line-height:1.4;}
+  .audit-q-btns{display:flex;gap:5px;flex-shrink:0;}
+  .audit-q-btn{padding:6px 10px;border-radius:6px;border:2px solid var(--tl-gray-300);font-size:11px;font-weight:700;cursor:pointer;transition:all 0.15s;background:var(--tl-white);color:var(--tl-gray-700);}
+  .audit-q-btn.sel-0{background:var(--tl-fail);color:var(--tl-white);border-color:var(--tl-fail);}
+  .audit-q-btn.sel-1{background:var(--tl-amber);color:var(--tl-white);border-color:var(--tl-amber);}
+  .audit-q-btn.sel-2{background:var(--tl-green);color:var(--tl-white);border-color:var(--tl-green);}
+  .audit-footer{padding:14px 24px;border-top:2px solid var(--tl-gray-100);display:flex;justify-content:space-between;align-items:center;}
+  .audit-prog-txt{font-size:12px;color:var(--tl-gray-500);font-weight:600;}
+  .audit-result-score{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:72px;line-height:1;}
+  .audit-result-score.high{color:var(--tl-green);}
+  .audit-result-score.mid{color:var(--tl-amber);}
+  .audit-result-score.low{color:var(--tl-fail);}
+  .audit-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+  @media(max-width:600px){.audit-q{flex-direction:column;align-items:flex-start}.audit-q-btns{width:100%}.audit-form-grid{grid-template-columns:1fr}}
+
   .fs-filters{background:var(--tl-white);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
   .fs-filter-label{font-size:11px;font-weight:700;color:var(--tl-gray-500);text-transform:uppercase;letter-spacing:1px;}
   .fs-chip{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:2px solid var(--tl-gray-200);background:var(--tl-white);color:var(--tl-gray-500);transition:all 0.2s;text-transform:uppercase;}
@@ -813,7 +884,25 @@
   <div class="module" id="module5S">
     <div class="screen-title animate-in">5S — Auditorías de Orden y Limpieza</div>
     <div class="screen-desc animate-in">Registro y seguimiento de auditorías por línea de producción</div>
+    <!-- KPIs -->
     <div class="fs-kpi-row" id="fsKPIs"></div>
+    <!-- Schedule -->
+    <div class="fs-sched-wrap animate-in">
+      <div class="fs-sched-hdr">
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:12px;">
+          <span class="fs-sched-title">&#128197; Programación de Auditorías</span>
+          <div style="display:flex;gap:6px;">
+            <span class="fs-chip active" data-fsview="semana" onclick="setFsView('semana',this)">Semana</span>
+            <span class="fs-chip" data-fsview="kanban" onclick="setFsView('kanban',this)">Kanban</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button class="btn-new-audit" onclick="openAuditModal(null)">+ Nueva Auditoría</button>
+          <button class="btn-collapse" id="fsSchedToggle" onclick="toggleFsSched()">&#9650; Colapsar</button>
+        </div>
+      </div>
+      <div class="fs-sched-body" id="fsSchedBody"></div>
+    </div>
     <div class="fs-filters" id="fsFilters">
       <span class="fs-filter-label">Línea</span>
       <div id="fsLineas" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
@@ -841,6 +930,21 @@
     </div>
     <div id="fsDetailWrap"></div>
   </div>
+
+
+<!-- ── AUDIT FORM MODAL ── -->
+<div class="audit-overlay" id="auditOverlay" onclick="if(event.target===this)closeAuditModal()">
+  <div class="audit-modal" id="auditModal">
+    <div class="audit-mhead">
+      <div>
+        <div class="audit-mhead-title" id="auditTitle">Nueva Auditoría 5S</div>
+        <div class="audit-mhead-sub" id="auditSub">Configura el área a auditar</div>
+      </div>
+      <button class="audit-close" onclick="closeAuditModal()">×</button>
+    </div>
+    <div id="auditContent"></div>
+  </div>
+</div>
 
 </div><!-- /main -->
 
@@ -1983,11 +2087,14 @@ function renderFiveS(){
   const reprobadas=demo_5s.filter(a=>a.status==='reprobada').length;
   const avgScore=Math.round(demo_5s.reduce((s,a)=>s+a.total,0)/demo_5s.length);
   const avgPct=Math.round(avgScore/50*100);
+  const delays=demo_5s_schedule.filter(s=>s.status==='retrasada').length;
+  const pendientes=demo_5s_schedule.filter(s=>s.status==='pendiente').length;
   document.getElementById('fsKPIs').innerHTML=`
     <div class="kpi-card kpi-blue"><div class="kpi-label">Total Auditorías</div><div class="kpi-value">${total}</div><div class="kpi-sub">Este mes</div></div>
     <div class="kpi-card kpi-green"><div class="kpi-label">Aprobadas</div><div class="kpi-value">${aprobadas}</div><div class="kpi-sub">${Math.round(aprobadas/total*100)}% del total</div></div>
     <div class="kpi-card kpi-amber"><div class="kpi-label">Con Observaciones</div><div class="kpi-value">${conObs}</div><div class="kpi-sub">Requieren seguimiento</div></div>
     <div class="kpi-card ${reprobadas>0?'kpi-red':'kpi-green'}"><div class="kpi-label">Reprobadas</div><div class="kpi-value">${reprobadas}</div><div class="kpi-sub">Acción inmediata</div></div>
+    <div class="kpi-card ${delays>0?'kpi-red':'kpi-blue'}"><div class="kpi-label">Delays esta semana</div><div class="kpi-value">${delays}</div><div class="kpi-sub">${pendientes} pendiente${pendientes!==1?'s':''} hoy</div></div>
   `;
 
   // Line filter chips
@@ -1997,6 +2104,7 @@ function renderFiveS(){
     lineas.map(l=>`<span class="fs-chip" data-fs-ln="${l}" onclick="setFsFilter('ln','${l}',this)">${l.split(' ').slice(0,2).join(' ')}</span>`).join('');
 
   applyFsFilters();
+  renderFsSchedule();
 }
 
 function setFsFilter(type,val,el){
@@ -2092,6 +2200,342 @@ function closeFsDetail(){
   fsSelectedId=null;
   document.getElementById('fsDetailWrap').innerHTML='';
 }
+
+/* ── 5S SCHEDULE DEMO DATA ── */
+const demo_5s_schedule=[
+  {id:'SCH-001',linea:'L-01 Truck-Lite 920',auditor:'Carlos Medina',fecha:'2026-04-14',turno:'1er Turno',status:'completada'},
+  {id:'SCH-002',linea:'L-02 Truck-Lite 120',auditor:'Ana Torres',   fecha:'2026-04-14',turno:'2do Turno',status:'completada'},
+  {id:'SCH-003',linea:'L-03 Truck-Lite 800',auditor:'Jorge Reyes',  fecha:'2026-04-15',turno:'1er Turno',status:'retrasada'},
+  {id:'SCH-004',linea:'L-04 Ensamble Final', auditor:'Pedro Vázquez',fecha:'2026-04-15',turno:'3er Turno',status:'completada'},
+  {id:'SCH-005',linea:'L-01 Truck-Lite 920',auditor:'Laura Soto',   fecha:'2026-04-16',turno:'1er Turno',status:'completada'},
+  {id:'SCH-006',linea:'L-02 Truck-Lite 120',auditor:'Ana Torres',   fecha:'2026-04-16',turno:'2do Turno',status:'retrasada'},
+  {id:'SCH-007',linea:'L-03 Truck-Lite 800',auditor:'Jorge Reyes',  fecha:'2026-04-17',turno:'1er Turno',status:'pendiente'},
+  {id:'SCH-008',linea:'L-04 Ensamble Final', auditor:'Carlos Medina',fecha:'2026-04-17',turno:'2do Turno',status:'pendiente'},
+  {id:'SCH-009',linea:'L-01 Truck-Lite 920',auditor:'Laura Soto',   fecha:'2026-04-18',turno:'1er Turno',status:'pendiente'},
+  {id:'SCH-010',linea:'L-02 Truck-Lite 120',auditor:'Pedro Vázquez',fecha:'2026-04-18',turno:'3er Turno',status:'pendiente'},
+  {id:'SCH-011',linea:'L-03 Truck-Lite 800',auditor:'Ana Torres',   fecha:'2026-04-21',turno:'1er Turno',status:'programada'},
+  {id:'SCH-012',linea:'L-04 Ensamble Final', auditor:'Laura Soto',  fecha:'2026-04-22',turno:'2do Turno',status:'programada'},
+];
+
+const AUDIT_QS={
+  seiri:{name:'Seiri',desc:'Clasificar — Eliminar lo innecesario',color:'var(--tl-red)',questions:[
+    '¿Se han eliminado materiales, herramientas u objetos innecesarios del área?',
+    '¿Los materiales de rechazo están identificados y separados del flujo?',
+    '¿No hay herramientas dañadas o en desuso en las estaciones de trabajo?',
+    '¿Los documentos obsoletos fueron retirados del área de trabajo?',
+    '¿El área está libre de equipos o maquinaria en desuso?',
+  ]},
+  seiton:{name:'Seiton',desc:'Ordenar — Un lugar para cada cosa',color:'var(--tl-amber)',questions:[
+    '¿Cada herramienta y material tiene un lugar designado y está en su lugar?',
+    '¿Las áreas de trabajo están debidamente delimitadas y señalizadas?',
+    '¿Los pasillos están completamente libres de obstrucciones?',
+    '¿Los materiales están almacenados correctamente (cantidad, altura, acceso)?',
+    '¿Las herramientas son accesibles de forma inmediata, sin necesidad de búsqueda?',
+  ]},
+  seiso:{name:'Seiso',desc:'Limpiar — Mantener limpio el lugar de trabajo',color:'var(--tl-blue)',questions:[
+    '¿El piso está limpio y libre de aceite, grasa u otros contaminantes?',
+    '¿Las máquinas y equipos están limpios y en buen estado visible?',
+    '¿Existe un programa de limpieza visible, publicado y actualizado?',
+    '¿Los utensilios de limpieza están organizados y disponibles en el área?',
+    '¿Se realizó la limpieza al finalizar el turno anterior correctamente?',
+  ]},
+  seiketsu:{name:'Seiketsu',desc:'Estandarizar — Establecer reglas y estándares',color:'var(--tl-teal)',questions:[
+    '¿Los estándares visuales (fotos, etiquetas, indicadores) están actualizados?',
+    '¿Los controles visuales son claros y comprensibles para todo el personal?',
+    '¿Los indicadores de nivel mínimo/máximo están marcados correctamente?',
+    '¿Las instrucciones de trabajo están visibles y vigentes en el área?',
+    '¿Los estándares 5S están publicados y son conocidos por el equipo?',
+  ]},
+  shitsuke:{name:'Shitsuke',desc:'Disciplinar — Respetar los estándares',color:'var(--tl-green)',questions:[
+    '¿El personal respeta consistentemente las normas y estándares establecidos?',
+    '¿Las auditorías 5S se realizan de forma regular con seguimiento documentado?',
+    '¿El personal recibió capacitación en 5S en los últimos 3 meses?',
+    '¿Las acciones correctivas de auditorías anteriores fueron cerradas en tiempo?',
+    '¿Existe un plan de mejora continua activo y visible para el área?',
+  ]},
+};
+
+/* ── SCHEDULE STATE ── */
+let fsSchedCollapsed=false, fsCurrentView='semana', fsWeekOffset=0, auditState={};
+
+function _getWeekDates(offset=0){
+  const now=new Date(),day=now.getDay(),mon=new Date(now);
+  mon.setDate(now.getDate()-(day===0?6:day-1)+(offset*7));mon.setHours(0,0,0,0);
+  return Array.from({length:7},(_,i)=>{const d=new Date(mon);d.setDate(mon.getDate()+i);return d;});
+}
+function _fmtDate(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function _isToday(d){const t=new Date();return d.getFullYear()===t.getFullYear()&&d.getMonth()===t.getMonth()&&d.getDate()===t.getDate();}
+const _DAYS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const _MONTHS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+function toggleFsSched(){
+  fsSchedCollapsed=!fsSchedCollapsed;
+  document.getElementById('fsSchedBody').classList.toggle('collapsed',fsSchedCollapsed);
+  document.getElementById('fsSchedToggle').innerHTML=fsSchedCollapsed?'&#9660; Expandir':'&#9650; Colapsar';
+}
+
+function setFsView(view,el){
+  fsCurrentView=view;
+  document.querySelectorAll('[data-fsview]').forEach(c=>c.classList.toggle('active',c.dataset.fsview===view));
+  renderFsSchedule();
+}
+
+function renderFsSchedule(){
+  const body=document.getElementById('fsSchedBody');if(!body)return;
+  if(fsCurrentView==='semana') renderWeekView(body);
+  else renderKanban(body);
+}
+
+function renderWeekView(body){
+  const days=_getWeekDates(fsWeekOffset);
+  const lines=[...new Set(demo_5s_schedule.map(s=>s.linea))];
+  const mon=days[0],sun=days[6];
+  const weekLabel=`${mon.getDate()} – ${sun.getDate()} ${_MONTHS[sun.getMonth()]} ${sun.getFullYear()}`;
+  const delays=demo_5s_schedule.filter(s=>s.status==='retrasada').length;
+  const pending=demo_5s_schedule.filter(s=>s.status==='pendiente').length;
+
+  body.innerHTML=`
+    <div class="fs-week-nav">
+      <button class="fs-week-arrow" onclick="fsWeekOffset--;renderFsSchedule()">&#8249;</button>
+      <div class="fs-week-label">Semana ${weekLabel}${delays>0?` &nbsp;<span style="background:var(--tl-fail-light);color:var(--tl-fail);border-radius:12px;padding:2px 10px;font-size:11px;">&#128308; ${delays} retrasada${delays>1?'s':''}</span>`:''}</div>
+      <button class="fs-week-arrow" onclick="fsWeekOffset++;renderFsSchedule()">&#8250;</button>
+    </div>
+    <div style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;min-width:560px;">
+      <thead><tr>
+        <th style="background:var(--tl-black);color:var(--tl-white);padding:10px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;min-width:110px;">Línea</th>
+        ${days.map(d=>`<th style="background:${_isToday(d)?'var(--tl-orange)':'var(--tl-black)'};color:var(--tl-white);padding:9px 6px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">
+          ${_DAYS[d.getDay()]} ${d.getDate()}${_isToday(d)?'<br><span style="font-size:9px;opacity:0.85;">HOY</span>':''}
+        </th>`).join('')}
+      </tr></thead>
+      <tbody>
+        ${lines.map(line=>`<tr>
+          <td style="background:var(--tl-gray-100);padding:8px 12px;font-size:11px;font-weight:700;border-bottom:1px solid #e8e8e8;white-space:nowrap;">${line.replace('Truck-Lite ','TL ')}</td>
+          ${days.map(d=>{
+            const ds=_fmtDate(d);
+            const items=demo_5s_schedule.filter(s=>s.linea===line&&s.fecha===ds);
+            return`<td style="padding:5px;border:1px solid var(--tl-gray-100);vertical-align:top;min-width:90px;${_isToday(d)?'background:#FFF8F0;':''}">
+              ${items.map(it=>`<div class="fs-sched-chip ${it.status}" onclick="openAuditModal('${it.id}')" title="${it.auditor} | ${it.turno}">
+                ${it.status==='completada'?'&#9989;':it.status==='retrasada'?'&#128308;':it.status==='pendiente'?'&#128309;':'&#128337;'}
+                ${it.auditor.split(' ')[0]}
+              </div>`).join('')}
+            </td>`;
+          }).join('')}
+        </tr>`).join('')}
+      </tbody>
+    </table></div>
+    <div class="fs-week-legend">
+      <span>&#9989; Completada</span>
+      <span>&#128308; Retrasada</span>
+      <span>&#128309; Pendiente</span>
+      <span>&#128337; Programada</span>
+      <span style="font-style:italic;">Haz clic en cualquier celda para abrir / iniciar la auditoría</span>
+    </div>`;
+}
+
+function renderKanban(body){
+  const cols=[
+    {key:'pendiente',label:'Pendiente',cls:'pendiente'},
+    {key:'retrasada',label:'Retrasada',cls:'retrasada'},
+    {key:'completada',label:'Completada',cls:'completada'},
+    {key:'programada',label:'Programada',cls:'programada'},
+  ];
+  body.innerHTML=`<div class="fs-kanban">
+    ${cols.map(col=>{
+      const items=demo_5s_schedule.filter(s=>s.status===col.key);
+      return`<div class="fs-kb-col">
+        <div class="fs-kb-title ${col.cls}">${col.label} <span>${items.length}</span></div>
+        ${items.length?items.map(it=>`
+          <div class="fs-kb-card" onclick="openAuditModal('${it.id}')">
+            <div class="fs-kb-card-id">${it.id}</div>
+            <div class="fs-kb-card-line">${it.linea.replace('Truck-Lite ','TL ')}</div>
+            <div class="fs-kb-card-meta">
+              <span>&#128100; ${it.auditor.split(' ')[0]}</span>
+              <span>&#128197; ${it.fecha.slice(5).replace('-','/')}</span>
+              <span>&#9200; ${it.turno.replace('er Turno','T').replace('do Turno','T').replace('er ','').replace('do ','').replace('er','').replace(' Turno','T')}</span>
+            </div>
+          </div>`).join(''):`<div class="fs-kb-empty">Sin registros</div>`}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+/* ── AUDIT MODAL ── */
+function openAuditModal(schedId){
+  auditState={step:-1,answers:{},schedId,linea:'',auditor:'',turno:'',fecha:new Date().toISOString().slice(0,10)};
+  if(schedId){
+    const sch=demo_5s_schedule.find(s=>s.id===schedId);
+    if(sch){auditState.linea=sch.linea;auditState.auditor=sch.auditor;auditState.turno=sch.turno;auditState.fecha=sch.fecha;auditState.step=0;}
+  }
+  document.getElementById('auditOverlay').classList.add('active');
+  _renderAuditHead();
+  if(auditState.step===0) renderAuditSection(0);
+  else renderAuditMeta();
+}
+
+function closeAuditModal(){
+  document.getElementById('auditOverlay').classList.remove('active');
+  auditState={};
+}
+
+function _renderAuditHead(){
+  const{linea,auditor,turno,fecha}=auditState;
+  document.getElementById('auditTitle').textContent=linea?`Auditoría 5S — ${linea.replace('Truck-Lite ','TL ')}` :'Nueva Auditoría 5S';
+  document.getElementById('auditSub').textContent=linea?`Auditor: ${auditor} | ${turno} | ${fecha}`:'Configura el área a auditar';
+}
+
+function renderAuditMeta(){
+  const lineas=['L-01 Truck-Lite 920','L-02 Truck-Lite 120','L-03 Truck-Lite 800','L-04 Ensamble Final'];
+  document.getElementById('auditContent').innerHTML=`
+    <div class="audit-body">
+      <div style="font-weight:700;font-size:15px;margin-bottom:16px;">Información del Área a Auditar</div>
+      <div class="audit-form-grid">
+        <div class="form-field"><label class="form-label">Línea / Área</label>
+          <select class="form-select" id="auditLinea">
+            <option value="">Seleccionar...</option>
+            ${lineas.map(l=>`<option value="${l}" ${auditState.linea===l?'selected':''}>${l}</option>`).join('')}
+          </select></div>
+        <div class="form-field"><label class="form-label">Auditor</label>
+          <input class="form-input" id="auditAuditor" value="${auditState.auditor}" placeholder="Nombre del auditor"></div>
+        <div class="form-field"><label class="form-label">Turno</label>
+          <select class="form-select" id="auditTurno">
+            <option value="">Seleccionar...</option>
+            <option value="1er Turno" ${auditState.turno==='1er Turno'?'selected':''}>1er Turno (6:00–14:00)</option>
+            <option value="2do Turno" ${auditState.turno==='2do Turno'?'selected':''}>2do Turno (14:00–22:00)</option>
+            <option value="3er Turno" ${auditState.turno==='3er Turno'?'selected':''}>3er Turno (22:00–6:00)</option>
+          </select></div>
+        <div class="form-field"><label class="form-label">Fecha</label>
+          <input class="form-input" type="date" id="auditFecha" value="${auditState.fecha}"></div>
+      </div>
+    </div>
+    <div class="audit-footer">
+      <span class="audit-prog-txt">Paso 0 de 5 — Información</span>
+      <button class="btn-submit" onclick="_auditMetaNext()" style="padding:12px 28px;font-size:15px;">Comenzar Auditoría ›</button>
+    </div>`;
+}
+
+function _auditMetaNext(){
+  const linea=document.getElementById('auditLinea').value;
+  const auditor=document.getElementById('auditAuditor').value.trim();
+  const turno=document.getElementById('auditTurno').value;
+  const fecha=document.getElementById('auditFecha').value;
+  if(!linea||!auditor||!turno){alert('Completa todos los campos');return;}
+  Object.assign(auditState,{linea,auditor,turno,fecha,step:0});
+  _renderAuditHead();
+  renderAuditSection(0);
+}
+
+function renderAuditSection(si){
+  auditState.step=si;
+  const keys=Object.keys(AUDIT_QS);
+  const key=keys[si],s=AUDIT_QS[key];
+  const tabs=keys.map((k,i)=>{
+    const done=auditState.answers[k]!==undefined&&Object.keys(auditState.answers[k]).length===5;
+    const active=i===si;
+    return`<div class="audit-s-tab ${done&&!active?'done':active?'active':'pending'}">${AUDIT_QS[k].name}</div>`;
+  }).join('');
+  const cur=auditState.answers[key]||{};
+  const filled=Object.keys(cur).length;
+  const sScore=Object.values(cur).reduce((a,b)=>a+b,0);
+  const qHtml=s.questions.map((q,qi)=>{
+    const val=cur[qi];
+    return`<div class="audit-q">
+      <div class="audit-q-text"><span style="color:var(--tl-gray-500);font-weight:700;margin-right:6px;">${qi+1}.</span>${q}</div>
+      <div class="audit-q-btns">
+        <button class="audit-q-btn ${val===0?'sel-0':''}" onclick="setAuditQ('${key}',${qi},0)">0 No</button>
+        <button class="audit-q-btn ${val===1?'sel-1':''}" onclick="setAuditQ('${key}',${qi},1)">1 Parcial</button>
+        <button class="audit-q-btn ${val===2?'sel-2':''}" onclick="setAuditQ('${key}',${qi},2)">2 Sí</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('auditContent').innerHTML=`
+    <div class="audit-s-progress">${tabs}</div>
+    <div class="audit-body">
+      <div class="audit-s-title" style="color:${s.color}">${s.name}</div>
+      <div class="audit-s-desc">${s.desc}</div>
+      ${filled>0?`<div class="audit-partial"><span style="font-size:13px;font-weight:600;">Puntaje parcial S${si+1}</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:24px;color:${sScore>=8?'var(--tl-green)':sScore>=5?'var(--tl-amber)':'var(--tl-fail)'};">${sScore} / 10</span></div>`:''}
+      <div class="audit-q-list">${qHtml}</div>
+    </div>
+    <div class="audit-footer">
+      <span class="audit-prog-txt">S${si+1} de 5 — ${filled}/5 respondidas</span>
+      <div style="display:flex;gap:8px;">
+        ${si>0?`<button class="btn-back" onclick="renderAuditSection(${si-1})">&#8249; Anterior</button>`:''}
+        <button class="btn-submit" onclick="_auditNext(${si})" style="padding:12px 24px;font-size:15px;">${si<4?'Siguiente ›':'Ver Resultados ›'}</button>
+      </div>
+    </div>`;
+}
+
+function setAuditQ(sKey,qi,val){
+  if(!auditState.answers[sKey])auditState.answers[sKey]={};
+  auditState.answers[sKey][qi]=val;
+  renderAuditSection(Object.keys(AUDIT_QS).indexOf(sKey));
+}
+
+function _auditNext(si){
+  const key=Object.keys(AUDIT_QS)[si];
+  if(Object.keys(auditState.answers[key]||{}).length<5){alert('Responde las 5 preguntas antes de continuar');return;}
+  if(si<4)renderAuditSection(si+1);
+  else renderAuditResults();
+}
+
+function renderAuditResults(){
+  auditState.step=5;
+  const keys=Object.keys(AUDIT_QS);
+  const scores={};let total=0;
+  keys.forEach(k=>{const s=Object.values(auditState.answers[k]||{}).reduce((a,b)=>a+b,0);scores[k]=s;total+=s;});
+  const pct=Math.round(total/50*100);
+  const status=pct>=80?'aprobada':pct>=60?'observaciones':'reprobada';
+  const sc=pct>=80?'high':pct>=60?'mid':'low';
+  const stLabel=status==='aprobada'?'Aprobada':status==='observaciones'?'Con Observaciones':'Reprobada';
+  const tabs=keys.map(k=>`<div class="audit-s-tab done">${AUDIT_QS[k].name}</div>`).join('');
+  const sCards=keys.map(k=>`<div class="fs-s-card ${scoreClass(scores[k],10)}" style="text-align:center;padding:14px;">
+    <div class="fs-s-name">${AUDIT_QS[k].name}</div>
+    <div class="fs-s-title" style="font-size:10px;margin-bottom:6px;">${AUDIT_QS[k].desc.split(' — ')[0]}</div>
+    <div class="fs-s-score">${scores[k]}</div><div class="fs-s-max">/10</div>
+  </div>`).join('');
+  document.getElementById('auditContent').innerHTML=`
+    <div class="audit-s-progress">${tabs}</div>
+    <div class="audit-body" style="text-align:center;">
+      <div class="audit-result-score ${sc}">${total}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;text-transform:uppercase;margin:4px 0 8px;">de 50 puntos (${pct}%)</div>
+      <span class="fs-st ${status}" style="font-size:14px;">${stLabel}</span>
+      <div class="fs-s-grid" style="margin-top:20px;margin-bottom:20px;">${sCards}</div>
+      <div class="form-field" style="text-align:left;margin-bottom:4px;">
+        <label class="form-label">Observaciones generales</label>
+        <textarea class="form-textarea" id="auditObs" placeholder="Observaciones, hallazgos o notas adicionales..." style="min-height:70px;"></textarea>
+      </div>
+    </div>
+    <div class="audit-footer">
+      <button class="btn-back" onclick="renderAuditSection(4)">&#8249; Revisar</button>
+      <button class="btn-submit" onclick="submitAudit()" style="padding:12px 28px;font-size:15px;background:var(--tl-green);">&#10003; Guardar Auditoría</button>
+    </div>`;
+}
+
+function submitAudit(){
+  const keys=Object.keys(AUDIT_QS);
+  const scores={};let total=0;
+  keys.forEach(k=>{const s=Object.values(auditState.answers[k]||{}).reduce((a,b)=>a+b,0);scores[k]=s;total+=s;});
+  const pct=Math.round(total/50*100);
+  const status=pct>=80?'aprobada':pct>=60?'observaciones':'reprobada';
+  const obs=document.getElementById('auditObs')?.value||'Sin observaciones adicionales.';
+  const dt=auditState.fecha;
+  const newId=`5S-${dt.replace(/-/g,'')}-${String(demo_5s.length+1).padStart(3,'0')}`;
+  demo_5s.unshift({
+    id:newId,folio:newId,linea:auditState.linea,auditor:auditState.auditor,
+    fecha:dt.split('-').reverse().join('/'),turno:auditState.turno,
+    scores,total,max:50,status,observaciones:obs,
+    acciones:status!=='aprobada'?[{texto:'Revisar hallazgos de esta auditoría y generar plan de acción',resp:auditState.auditor,status:'open'}]:[],
+  });
+  if(auditState.schedId){
+    const sch=demo_5s_schedule.find(s=>s.id===auditState.schedId);
+    if(sch)sch.status='completada';
+  }
+  closeAuditModal();
+  renderFiveS();
+  setTimeout(()=>document.querySelector('.fs-table-wrap')?.scrollIntoView({behavior:'smooth',block:'start'}),300);
+}
+
 </script>
 </body>
 </html>
